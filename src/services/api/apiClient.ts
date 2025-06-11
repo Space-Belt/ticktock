@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-export const BASE_API_URL = 'https://ct.pointda.com/api';
+export const BASE_API_URL = '';
 
 const apiClient = axios.create({
   baseURL: BASE_API_URL,
