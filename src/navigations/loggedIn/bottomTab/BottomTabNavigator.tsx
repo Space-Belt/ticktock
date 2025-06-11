@@ -25,9 +25,6 @@ const BottomTabNavigator = () => {
     <TickTockSafeAreaView edges={['top']}>
       <BottomTab.Navigator screenOptions={bottomTabScreenOptions}>
         <BottomTab.Screen name="HomeStack" component={HomeStackNavigator} />
-        <BottomTab.Screen name="HomeStack" component={HomeStackNavigator} />
-        <BottomTab.Screen name="HomeStack" component={HomeStackNavigator} />
-        <BottomTab.Screen name="HomeStack" component={HomeStackNavigator} />
       </BottomTab.Navigator>
     </TickTockSafeAreaView>
   );

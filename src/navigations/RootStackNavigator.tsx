@@ -1,23 +1,12 @@
+import { useNavigatorScreenOptions } from '@hooks/useNavigatorScreenOptions';
 import LoggedOutStackNavigator, {
   LoggedOutStackParamList,
 } from '@navigations/loggedOut/LoggedOutStackNavigator';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { type StackNavigationProp } from '@react-navigation/stack';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect } from 'react';
 import LoggedInStackNavigator from './loggedIn/LoggedInStackNavigator';
 import { MainStackParamList } from './loggedIn/main/MainStackNavigator';
-import { useNavigatorScreenOptions } from '@hooks/useNavigatorScreenOptions';
-import { View } from 'react-native';
-
-// 🌳 <RootStackNavigator />
-// 🔐 Logged In ?
-// -> ❌ But phone is not verified -> <SmsAuthStackNavigator />
-// -> ✅ But phone is verified -> <LoggedInStackNavigator />
-// -> 🤷‍♂️ But required profile is not set -> <RequiredProfileInputScreen />
-// 🔓 Logged Out ?
-// -> <LoggedOutStackNavigator />
 
 type RootStackParamList = {
   LoggedInStack: {
@@ -36,7 +25,7 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const RootStackNavigator = () => {
   const { nativeScreenOptions } = useNavigatorScreenOptions();
-  const accessToken = false;
+  const accessToken = true;
 
   return (
     <NavigationContainer>

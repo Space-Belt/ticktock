@@ -1,16 +1,27 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Font } from '@styles/font';
 import React from 'react';
+import { ScrollView, StyleSheet } from 'react-native';
 
-type Props = {};
+import TickTockHomeHeader from '@components/TickTockHomeHeader';
+import TodaysSchedule from './components/TodaysSchedule';
 
-const HomeScreen = (props: Props) => {
+const HomeScreen = () => {
   return (
-    <View>
-      <Text>HomeScreen</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      <TickTockHomeHeader />
+      <TodaysSchedule />
+    </ScrollView>
   );
 };
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  title: {
+    ...Font.display,
+  },
+});
