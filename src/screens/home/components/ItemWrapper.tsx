@@ -5,13 +5,17 @@ import { Font } from '@styles/font';
 
 type Props = {
   title: string;
+  topChildren?: React.ReactNode;
   children: React.ReactNode;
 };
 
-const ItemWrapper = ({ title, children }: Props) => {
+const ItemWrapper = ({ title, children, topChildren }: Props) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{title}</Text>
+      <View style={styles.topWrapper}>
+        <Text style={styles.title}>{title}</Text>
+        {topChildren}
+      </View>
       {children}
     </View>
   );
@@ -26,9 +30,14 @@ const styles = StyleSheet.create(theme => ({
     borderColor: theme.colors.border.primary,
     borderRadius: 8,
   },
+  topWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
   title: {
     ...Font.bodyLargeExtraBold,
     color: theme.colors.text.primary,
-    marginBottom: 16,
   },
 }));

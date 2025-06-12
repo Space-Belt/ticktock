@@ -48,10 +48,7 @@ const TodoItem = ({ id, title, completed, handleTodoClicked }: Props) => {
         handleTodoClicked(id, handleCheckWidth);
       }}
       style={styles.container}>
-      {
-        completed ? <CheckIcon /> : <UnCheckIcon />
-        // ÷<View style={styles.checkBox} />
-      }
+      {completed ? <CheckIcon /> : <UnCheckIcon />}
       <Animated.View style={[styles.basicCheckStyle, checkStyle]} />
       <Text style={styles.titleStyle(completed)}>{title}</Text>
     </TouchableOpacity>
