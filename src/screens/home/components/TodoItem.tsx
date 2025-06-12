@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import { Font } from '@styles/font';
@@ -12,13 +12,13 @@ type Props = {
 
 const TodoItem = ({ id, title, completed, handleTodoClicked }: Props) => {
   return (
-    <Pressable
+    <TouchableOpacity
       onPress={() => {
         handleTodoClicked(id);
       }}
       style={styles.container}>
       <Text style={styles.titleStyle(completed)}>{title}</Text>
-    </Pressable>
+    </TouchableOpacity>
   );
 };
 

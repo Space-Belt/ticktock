@@ -58,12 +58,30 @@ const MOCK_DATA: ITodo[] = [
 
 const TodaysSchedule = () => {
   const navigation = useNavigation();
+  const [todoData, setTodoData] = React.useState<ITodo[]>([...MOCK_DATA]);
 
-  const handleTodoClicked = (id: string) => {};
+  const handleTodoClicked = (id: string) => {
+    const currentDate = new Date().toISOString().split('T')[0];
+
+    const updatedTodos = todoData.map(todo => {
+      if (todo.id === id) {
+        return {
+          ...todo,
+          completed: !todo.completed,
+          completedDates: todo.completed
+            ? todo.completedDates?.filter(date => date !== currentDate)
+            : [...(todo.completedDates || []), currentDate],
+        };
+      }
+      return todo;
+    });
+
+    setTodoData(updatedTodos);
+  };
   return (
     <ItemWrapper title={'Todays Schedule'}>
       <View style={styles.container}>
-        {MOCK_DATA.map((el, index) => (
+        {todoData.map((el, index) => (
           <TodoItem
             key={el.id}
             completed={el.completed}
