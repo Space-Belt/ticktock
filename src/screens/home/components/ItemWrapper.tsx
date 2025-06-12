@@ -29,6 +29,6 @@ const styles = StyleSheet.create(theme => ({
   title: {
     ...Font.bodyLargeExtraBold,
     color: theme.colors.text.primary,
-    marginBottom: 10,
+    marginBottom: 16,
   },
 }));

@@ -1,5 +1,5 @@
 export interface ITodo {
-  id: number; // 고유 ID
+  id: string; // 고유 ID
   title: string; // 제목
   completed: boolean; // 완료 여부
 
