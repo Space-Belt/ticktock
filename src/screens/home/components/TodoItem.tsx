@@ -1,9 +1,12 @@
-import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
-import { StyleSheet } from 'react-native-unistyles';
 import { Font } from '@styles/font';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { SCREEN_WIDTH } from '@utils/public';
+import React from 'react';
+import { Text, TouchableOpacity } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { StyleSheet } from 'react-native-unistyles';
+
+import CheckIcon from '@assets/images/icon_checked.svg';
+import UnCheckIcon from '@assets/images/icon_unchecked.svg';
 
 type Props = {
   id: string;
@@ -16,10 +19,18 @@ const TodoItem = ({ id, title, completed, handleTodoClicked }: Props) => {
   const checkWidth = useSharedValue(0);
 
   const checkStyle = useAnimatedStyle(() => {
+    const shadowIntensity = checkWidth.value > 0 ? 0.5 : 0;
     return {
       width: checkWidth.value,
       height: checkWidth.value > 0 ? 1 : 0,
-      borderWidth: checkWidth.value > 0 ? 0.5 : 0,
+      borderWidth: checkWidth.value > 0 ? 0.75 : 0,
+
+      shadowColor: 'black',
+      shadowOpacity: shadowIntensity,
+      shadowRadius: checkWidth.value > 0 ? 4 : 0,
+      shadowOffset: { width: 0, height: checkWidth.value > 0 ? 2 : 0 },
+
+      elevation: checkWidth.value > 0 ? 5 : 0,
     };
   });
 
@@ -37,7 +48,10 @@ const TodoItem = ({ id, title, completed, handleTodoClicked }: Props) => {
         handleTodoClicked(id, handleCheckWidth);
       }}
       style={styles.container}>
-      <View style={styles.checkBox} />
+      {
+        completed ? <CheckIcon /> : <UnCheckIcon />
+        // ÷<View style={styles.checkBox} />
+      }
       <Animated.View style={[styles.basicCheckStyle, checkStyle]} />
       <Text style={styles.titleStyle(completed)}>{title}</Text>
     </TouchableOpacity>
@@ -51,12 +65,10 @@ const styles = StyleSheet.create(theme => ({
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 6,
-    // backgroundColor: 'red',
     gap: 10,
   },
   titleStyle: (completed: boolean) => ({
     ...Font.bodySmallBold,
-    textDecorationLine: completed ? 'line-through' : 'none',
   }),
   checkBox: {
     width: 20,
