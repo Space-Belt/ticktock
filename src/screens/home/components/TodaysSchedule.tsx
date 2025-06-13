@@ -9,151 +9,8 @@ import { StyleSheet } from 'react-native-unistyles';
 import ItemWrapper from './ItemWrapper';
 import PrevNextController from './PrevNextController';
 import TodoItem from './TodoItem';
-
-const MOCK_DATA: ITodo[] = [
-  {
-    id: '1',
-    title: 'Morning Exercise',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['health', 'fitness'],
-    priority: 'high',
-    completedDates: ['2025-06-01'],
-    repeat: 'daily',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-  },
-  {
-    id: '2',
-    title: 'Team Meeting',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'meeting'],
-    priority: 'medium',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['mon', 'wed', 'fri'],
-  },
-  {
-    id: '3',
-    title: 'Content Creation',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'content'],
-    priority: 'low',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['tue', 'thu', 'fri'],
-  },
-  {
-    id: '4',
-    title: 'Design Sprint',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'design'],
-    priority: 'high',
-    completedDates: ['2025-06-01'],
-    repeat: 'daily',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-  },
-  {
-    id: '5',
-    title: 'Client Call',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'call'],
-    priority: 'medium',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['mon', 'wed', 'fri'],
-  },
-  {
-    id: '6',
-    title: 'Weekly Report',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'report'],
-    priority: 'low',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['tue', 'thu', 'fri'],
-  },
-  {
-    id: '7',
-    title: 'Weekly Report',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'report'],
-    priority: 'low',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['tue', 'thu', 'fri'],
-  },
-  {
-    id: '8',
-    title: 'Weekly Report',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'report'],
-    priority: 'low',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['tue', 'thu', 'fri'],
-  },
-  {
-    id: '9',
-    title: 'Weekly Report',
-    completed: false,
-    created_at: '2025-06-01',
-    goalStartDate: '2025-06-01',
-    goalEndDate: '2025-06-10',
-    tags: ['work', 'report'],
-    priority: 'low',
-    completedDates: ['2025-06-01'],
-    repeat: 'weekly',
-    repeatStartDate: '2025-06-01',
-    repeatEndDate: '2025-06-30',
-    repeatInterval: 1,
-    repeatDays: ['tue', 'thu', 'fri'],
-  },
-];
+import { MOCK_DATA } from '@utils/mock';
+import TickTockButton from '@components/TickTockButton';
 
 const TodaysSchedule = () => {
   const navigation = useNavigation();
@@ -163,19 +20,6 @@ const TodaysSchedule = () => {
   const [todoData, setTodoData] = React.useState<ITodo[]>([...MOCK_DATA]);
   const [showAll, setShowAll] = React.useState(false);
   const displayedTodos = todoData.length > 7 && !showAll ? todoData.slice(0, 5) : todoData;
-
-  const handleChangeDate = (type: 'prev' | 'next') => {
-    if (type === 'prev') {
-      // const prevDate = moment().subtract(1, 'day').toDate();
-      const formattedDate = moment().subtract(1, 'day').format('YYYY-MM-DD');
-      console.log(formattedDate);
-    } else {
-      // const nextDate = moment().;
-      // nextDate.setDate(nextDate.getDate() + 1);
-      // setSettedDate(moment(nextDate).format('YYYY-MM-DD'));
-      // console.log(moment(nextDate).format('YYYY-MM-DD'));
-    }
-  };
 
   const handleTodoClicked = (id: string, callBack: () => void) => {
     const currentDate = new Date().toISOString().split('T')[0];
@@ -214,6 +58,11 @@ const TodaysSchedule = () => {
     ));
   };
 
+  // 날짜 변하면 데이터 불러오기 로직 추가해야함
+  React.useEffect(() => {
+    console.log(currentDate);
+  }, [currentDate]);
+
   return (
     <ItemWrapper
       title={'Todays Schedule'}
@@ -228,7 +77,14 @@ const TodaysSchedule = () => {
       <View style={styles.container}>
         {renderTodos(displayedTodos)}
         {todoData.length > 7 && (
-          <Button title={showAll ? '접기' : '더보기'} onPress={() => setShowAll(prev => !prev)} />
+          <View style={styles.buttonContainer}>
+            <TickTockButton
+              title={showAll ? '접기' : '더보기'}
+              onPress={() => setShowAll(prev => !prev)}
+              width={80}
+              height={30}
+            />
+          </View>
         )}
       </View>
     </ItemWrapper>
@@ -239,4 +95,7 @@ export default TodaysSchedule;
 
 const styles = StyleSheet.create(theme => ({
   container: {},
+  buttonContainer: {
+    alignItems: 'center',
+  },
 }));
