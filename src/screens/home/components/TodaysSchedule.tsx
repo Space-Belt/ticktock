@@ -1,10 +1,13 @@
 import { ITodo } from '@entities/todo';
+import useDate from '@hooks/useDate';
 import { useNavigation } from '@react-navigation/native';
+import moment from 'moment';
 import React from 'react';
 import { Button, View } from 'react-native';
 import Animated, { BounceInLeft } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native-unistyles';
 import ItemWrapper from './ItemWrapper';
+import PrevNextController from './PrevNextController';
 import TodoItem from './TodoItem';
 
 const MOCK_DATA: ITodo[] = [
@@ -155,8 +158,24 @@ const MOCK_DATA: ITodo[] = [
 const TodaysSchedule = () => {
   const navigation = useNavigation();
 
+  const { currentDate, goToPreviousDay, goToNextDay } = useDate();
+
   const [todoData, setTodoData] = React.useState<ITodo[]>([...MOCK_DATA]);
   const [showAll, setShowAll] = React.useState(false);
+  const displayedTodos = todoData.length > 7 && !showAll ? todoData.slice(0, 5) : todoData;
+
+  const handleChangeDate = (type: 'prev' | 'next') => {
+    if (type === 'prev') {
+      // const prevDate = moment().subtract(1, 'day').toDate();
+      const formattedDate = moment().subtract(1, 'day').format('YYYY-MM-DD');
+      console.log(formattedDate);
+    } else {
+      // const nextDate = moment().;
+      // nextDate.setDate(nextDate.getDate() + 1);
+      // setSettedDate(moment(nextDate).format('YYYY-MM-DD'));
+      // console.log(moment(nextDate).format('YYYY-MM-DD'));
+    }
+  };
 
   const handleTodoClicked = (id: string, callBack: () => void) => {
     const currentDate = new Date().toISOString().split('T')[0];
@@ -178,7 +197,6 @@ const TodaysSchedule = () => {
     callBack();
   };
 
-  const displayedTodos = todoData.length > 7 && !showAll ? todoData.slice(0, 5) : todoData;
   const renderTodos = (todos: ITodo[]): React.ReactNode => {
     if (todos.length === 0) {
       return <></>;
@@ -197,10 +215,18 @@ const TodaysSchedule = () => {
   };
 
   return (
-    <ItemWrapper title={'Todays Schedule'}>
+    <ItemWrapper
+      title={'Todays Schedule'}
+      topChildren={
+        <PrevNextController
+          text={currentDate}
+          handlePrevClicked={goToPreviousDay}
+          handleNextClicked={goToNextDay}
+          gap={10}
+        />
+      }>
       <View style={styles.container}>
         {renderTodos(displayedTodos)}
-
         {todoData.length > 7 && (
           <Button title={showAll ? '접기' : '더보기'} onPress={() => setShowAll(prev => !prev)} />
         )}

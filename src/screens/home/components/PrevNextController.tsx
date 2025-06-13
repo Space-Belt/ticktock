@@ -6,19 +6,20 @@ import LeftIcon from '@assets/images/icon_chevron_left.svg';
 import RightIcon from '@assets/images/icon_chevron_right.svg';
 
 type Props = {
-  handleClicked: (type: 'prev' | 'next') => void;
+  handlePrevClicked: () => void;
+  handleNextClicked: () => void;
   gap: number;
   text?: string;
 };
 
-const PrevNextController = ({ handleClicked, gap, text }: Props) => {
+const PrevNextController = ({ handlePrevClicked, handleNextClicked, gap, text }: Props) => {
   return (
     <View style={styles.container(gap)}>
-      <Pressable onPress={() => handleClicked('prev')}>
+      <Pressable onPress={handlePrevClicked}>
         <LeftIcon style={styles.iconStyle} />
       </Pressable>
       {text && <Text>{text}</Text>}
-      <Pressable onPress={() => handleClicked('next')}>
+      <Pressable onPress={handleNextClicked}>
         <RightIcon style={styles.iconStyle} />
       </Pressable>
     </View>
