@@ -1,16 +1,15 @@
+import TickTockButton from '@components/TickTockButton';
 import { ITodo } from '@entities/todo';
 import useDate from '@hooks/useDate';
 import { useNavigation } from '@react-navigation/native';
-import moment from 'moment';
+import { MOCK_DATA } from '@utils/mock';
 import React from 'react';
-import { Button, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { BounceInLeft } from 'react-native-reanimated';
 import { StyleSheet } from 'react-native-unistyles';
 import ItemWrapper from './ItemWrapper';
 import PrevNextController from './PrevNextController';
 import TodoItem from './TodoItem';
-import { MOCK_DATA } from '@utils/mock';
-import TickTockButton from '@components/TickTockButton';
 
 const TodaysSchedule = () => {
   const navigation = useNavigation();
@@ -65,7 +64,7 @@ const TodaysSchedule = () => {
 
   return (
     <ItemWrapper
-      title={'Todays Schedule'}
+      title={'할일 하세요'}
       topChildren={
         <PrevNextController
           text={currentDate}
