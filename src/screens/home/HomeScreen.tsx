@@ -4,12 +4,14 @@ import { ScrollView, StyleSheet } from 'react-native';
 
 import TickTockHomeHeader from '@components/TickTockHomeHeader';
 import TodaysSchedule from './components/TodaysSchedule';
+import WeatherSection from './components/WeatherSection';
 
 const HomeScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <TickTockHomeHeader />
       <TodaysSchedule />
+      <WeatherSection />
     </ScrollView>
   );
 };

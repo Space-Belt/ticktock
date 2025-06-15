@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 // 날씨 API URL (예시)
-export const WEATHER_API_URL = `https://api.weatherapi.com/v1/current.json?key=${YOUR_API_KEY}`;
+export const WEATHER_API_URL = `https://api.openweathermap.org/data/2.5/weather?`;
+// https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}
 
 const weatherApiClient = axios.create({
   baseURL: WEATHER_API_URL,
