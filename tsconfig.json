@@ -16,7 +16,10 @@
       "@styles/*": ["./src/styles/*"],
       "@utils/*": ["./src/utils/*"],
       "typeRoots": ["./node_modules/@types", "./types"]
-    }
+    },
+    "typeRoots": ["types"],
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "exclude": ["node_modules", "babel.config.js", "metro.config.js", "jest.config.js"],
   "include": ["./src/**/*.ts", "./src/**/*.tsx", "./src/**/*", "declarations.d.ts"]
