@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native';
+import { StyleProp, Text, View, ViewStyle } from 'react-native';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import { Font } from '@styles/font';
@@ -7,11 +7,12 @@ type Props = {
   title: string;
   topChildren?: React.ReactNode;
   children: React.ReactNode;
+  styleProp?: StyleProp<ViewStyle>;
 };
 
-const ItemWrapper = ({ title, children, topChildren }: Props) => {
+const ItemWrapper = ({ title, children, topChildren, styleProp = {} }: Props) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, styleProp]}>
       <View style={styles.topWrapper}>
         <Text style={styles.title}>{title}</Text>
         {topChildren}
