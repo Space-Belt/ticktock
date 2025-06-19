@@ -14,7 +14,6 @@ export const getWeatherWithLatLng = async (lat: number, lng: number): Promise<IW
   }
 };
 
-// /weather?q={city name}&appid={API key}
 export const getWeatherWithCity = async (city: string): Promise<IWeatherData> => {
   const endPoint = `?q=Seoul&appid=${Config.WEATHER_API_KEY}`;
 
