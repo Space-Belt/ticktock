@@ -10,8 +10,8 @@ const HomeScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <TickTockHomeHeader />
-      <TodaysSchedule />
       <WeatherSection />
+      <TodaysSchedule />
     </ScrollView>
   );
 };

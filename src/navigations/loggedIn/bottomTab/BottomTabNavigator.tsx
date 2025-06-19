@@ -6,6 +6,9 @@ import HomeStackNavigator, {
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { type StackNavigationProp } from '@react-navigation/stack';
 import { StyleSheet } from 'react-native-unistyles';
+import HomeIcon from '@assets/images/icon_home.svg';
+
+const ICON_SIZE = 28;
 
 export type BottomTabParamList = {
   HomeStack: {
@@ -24,12 +27,28 @@ const BottomTabNavigator = () => {
   return (
     <TickTockSafeAreaView edges={['top']}>
       <BottomTab.Navigator screenOptions={bottomTabScreenOptions}>
-        <BottomTab.Screen name="HomeStack" component={HomeStackNavigator} />
+        <BottomTab.Screen
+          name="HomeStack"
+          component={HomeStackNavigator}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <HomeIcon
+                fill={styles.tabBarIcon(focused).color}
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+              />
+            ),
+          }}
+        />
       </BottomTab.Navigator>
     </TickTockSafeAreaView>
   );
 };
 
-const styles = StyleSheet.create(theme => ({}));
+const styles = StyleSheet.create(theme => ({
+  tabBarIcon: (focused: boolean) => ({
+    color: focused ? theme.colors.text.primary : theme.colors.text.secondary,
+  }),
+}));
 
 export default BottomTabNavigator;

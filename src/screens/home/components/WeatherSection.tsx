@@ -7,8 +7,6 @@ import ItemWrapper from './ItemWrapper';
 import { WEATHER_CONDITIONS } from '@entities/weather';
 import { kelvinToCelsius } from '@utils/public';
 
-type Props = {};
-
 const renderIcon = (code: number) => {
   const weather = WEATHER_CONDITIONS[code];
   return weather ? <weather.icon /> : null;
@@ -46,7 +44,7 @@ export default WeatherSection;
 
 const styles = StyleSheet.create(theme => ({
   wrapperStyle: {
-    marginTop: 16,
+    marginBottom: 16,
   },
   weatherWrapper: {
     flexDirection: 'row',
