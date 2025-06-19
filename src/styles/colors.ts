@@ -63,7 +63,7 @@ export const lightTheme: UnistylesThemeType = {
       warning: '#FFC107', // 경고 텍스트 (황금색)
     },
     button: {
-      primary: '#0066CC', // 기본 버튼 배경 (파란색)
+      primary: '#E0B589', // 기본 버튼 배경 (파란색)
       secondary: '#E0E0E0', // 비활성화 버튼 (회색)
       hover: '#0056A2', // 버튼 호버 효과 (어두운 파란색)
       danger: '#F44336', // 위험 버튼 (빨간색)
