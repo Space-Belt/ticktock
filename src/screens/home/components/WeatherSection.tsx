@@ -4,15 +4,15 @@ import { useQuery } from '@tanstack/react-query';
 import { getWeatherWithCity } from '@services/weather/weather';
 import { StyleSheet } from 'react-native-unistyles';
 import ItemWrapper from './ItemWrapper';
-import SunIcon from '@assets/images/icon_sunny.svg';
-import RainIcon from '@assets/images/icon_rainy.svg';
-import SnowIcon from '@assets/images/icon_snow.svg';
-import ThunderIcon from '@assets/images/icon_thunder.svg';
-import WindIcon from '@assets/images/icon_wind.svg';
-import CloudIcon from '@assets/images/icon_cloud.svg';
 import { WEATHER_CONDITIONS } from '@entities/weather';
+import { kelvinToCelsius } from '@utils/public';
 
 type Props = {};
+
+const renderIcon = (code: number) => {
+  const weather = WEATHER_CONDITIONS[code];
+  return weather ? <weather.icon /> : null;
+};
 
 const WeatherSection = (props: Props) => {
   const { data, isLoading, error } = useQuery({
@@ -26,23 +26,18 @@ const WeatherSection = (props: Props) => {
     console.log(error);
   }, [data, isLoading, error]);
 
-  const renderIcon = (code: number) => {
-    const IconComponent = WEATHER_CONDITIONS[code].icon;
-    if (IconComponent === 'Sun') return <SunIcon />;
-    if (IconComponent === 'Rain') return <RainIcon />;
-    if (IconComponent === 'Snow') return <SnowIcon />;
-    if (IconComponent === 'Thunder') return <ThunderIcon />;
-    if (IconComponent === 'Wind') return <WindIcon />;
-    if (IconComponent === 'Cloudy') return <CloudIcon />;
-  };
-
   if (isLoading || error || data === undefined) {
     return <></>;
   }
 
   return (
     <ItemWrapper title="날씨" styleProp={styles.wrapperStyle}>
-      {renderIcon(data.weather[0].id)}
+      <View style={styles.weatherWrapper}>
+        {renderIcon(data.weather[0].id)}
+        <Text>{`${kelvinToCelsius(data.main.temp)} °C`}</Text>
+        <Text>{`${data.main.humidity} %`}</Text>
+        <Text>{WEATHER_CONDITIONS[data.weather[0].id].name}</Text>
+      </View>
     </ItemWrapper>
   );
 };
@@ -52,5 +47,11 @@ export default WeatherSection;
 const styles = StyleSheet.create(theme => ({
   wrapperStyle: {
     marginTop: 16,
+  },
+  weatherWrapper: {
+    flexDirection: 'row',
+
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
 }));

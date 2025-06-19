@@ -70,7 +70,6 @@ const TodaysSchedule = () => {
           text={currentDate}
           handlePrevClicked={goToPreviousDay}
           handleNextClicked={goToNextDay}
-          gap={10}
         />
       }>
       <View style={styles.container}>
