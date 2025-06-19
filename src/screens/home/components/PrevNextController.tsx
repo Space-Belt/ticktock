@@ -8,17 +8,18 @@ import RightIcon from '@assets/images/icon_chevron_right.svg';
 type Props = {
   handlePrevClicked: () => void;
   handleNextClicked: () => void;
-  gap: number;
+  gap?: number;
   text?: string;
+  width?: number;
 };
 
-const PrevNextController = ({ handlePrevClicked, handleNextClicked, gap, text }: Props) => {
+const PrevNextController = ({ handlePrevClicked, handleNextClicked, gap, text, width }: Props) => {
   return (
-    <View style={styles.container(gap)}>
+    <View style={styles.container(gap, width)}>
       <Pressable onPress={handlePrevClicked}>
         <LeftIcon style={styles.iconStyle} />
       </Pressable>
-      {text && <Text>{text}</Text>}
+      {text && <Text style={styles.textStyle}>{text}</Text>}
       <Pressable onPress={handleNextClicked}>
         <RightIcon style={styles.iconStyle} />
       </Pressable>
@@ -29,12 +30,17 @@ const PrevNextController = ({ handlePrevClicked, handleNextClicked, gap, text }:
 export default PrevNextController;
 
 const styles = StyleSheet.create(theme => ({
-  container: (gap: number) => ({
+  container: (gap?: number, width?: number) => ({
     flexDirection: 'row',
     alignItems: 'center',
     gap,
+    width,
   }),
   iconStyle: {
     color: theme.colors.text.primary,
+  },
+  textStyle: {
+    width: 100,
+    textAlign: 'center',
   },
 }));
