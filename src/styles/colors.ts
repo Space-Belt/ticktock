@@ -40,6 +40,9 @@ export interface UnistylesThemeType {
       secondary: string; // 비활성화된 아이콘 색상
       highlight: string; // 강조된 아이콘 색상
     };
+    textInput: {
+      primary: string;
+    };
   };
 }
 
@@ -85,6 +88,9 @@ export const lightTheme: UnistylesThemeType = {
       secondary: '#7A7A7A', // 비활성화된 아이콘 (연한 회색)
       highlight: '#FF5722', // 강조 아이콘 (주황색)
     },
+    textInput: {
+      primary: '#f5f5f5',
+    },
   },
 };
 
@@ -129,6 +135,9 @@ export const darkTheme: UnistylesThemeType = {
       primary: '#FFFBEC', // 기본 아이콘 색상 (밝은 크림색)
       secondary: '#7A7A7A', // 비활성화된 아이콘 (연한 회색)
       highlight: '#FF5722', // 강조 아이콘 (주황색)
+    },
+    textInput: {
+      primary: '#f5f5f5',
     },
   },
 };
