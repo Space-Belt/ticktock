@@ -5,6 +5,8 @@ export interface ITodo {
 
   created_at: string; // 생성 날짜
 
+  color?: string;
+
   goalStartDate?: string; // 목표 시작일
   goalEndDate?: string; // 목표 종료일
 

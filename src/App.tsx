@@ -5,6 +5,7 @@ import { StyleSheet } from 'react-native-unistyles';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '@utils/reactQuery';
 import RootStackNavigator from '@navigations/RootStackNavigator';
+import TickTockModal from '@components/TickTockModal';
 
 const App = () => {
   return (
@@ -12,6 +13,7 @@ const App = () => {
       <GestureHandlerRootView>
         <QueryClientProvider client={queryClient}>
           <RootStackNavigator />
+          <TickTockModal />
         </QueryClientProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
