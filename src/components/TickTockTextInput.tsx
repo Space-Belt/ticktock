@@ -1,3 +1,4 @@
+import { Font } from '@styles/font';
 import React from 'react';
 import { View, TextInput, Text } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
@@ -25,10 +26,9 @@ const TickTockTextInput: React.FC<InputProps> = ({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        multiline
+        multiline={true}
         textAlignVertical="top"
         placeholderTextColor="#888"
-        numberOfLines={1}
       />
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
     </View>
@@ -41,19 +41,18 @@ const styles = StyleSheet.create(theme => ({
     paddingHorizontal: 10,
   },
   label: {
-    fontSize: 16,
-    color: '#333',
-    marginBottom: 5,
+    ...Font.bodySmallExtraBold,
+    color: theme.colors.text.primary,
+    marginBottom: 10,
+    paddingLeft: 5,
   },
   input: {
-    minHeight: 40,
-    maxHeight: 200,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
-    paddingHorizontal: 10,
+    paddingHorizontal: 5,
     paddingVertical: 10,
-    fontSize: 16,
+    ...Font.bodySmallExtraBold,
     color: '#333',
     backgroundColor: theme.colors.textInput.primary,
     textAlignVertical: 'top',
