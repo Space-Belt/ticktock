@@ -9,8 +9,11 @@ import ColorPicker from 'reanimated-color-picker';
 import TickTockButton from '@components/TickTockButton';
 import { useModal } from '@stores/zustand/modal';
 import { Calendar } from 'react-native-calendars';
+import moment from 'moment';
+import TickTockToggleButton from '@components/TickTockToggleButton';
 
 const AddTodoScreen = () => {
+  const today = moment().format('YYYY-MM-DD');
   const navigation = useNavigation<LoggedInStackNavigationProp>();
   const handleBackNavigtion = () => {
     navigation.goBack();
@@ -20,6 +23,11 @@ const AddTodoScreen = () => {
 
   const [color, setColor] = React.useState('#000000');
   const [priority, setPriority] = React.useState(0);
+
+  // '2012-03-01': { selected: true, marked: true, selectedColor: 'blue' },
+  // '2012-03-02': { selected: true, marked: true, selectedColor: 'blue' },
+  // '2012-03-03': { selected: true, marked: true, selectedColor: 'blue' },
+
   const [goalStartDate, setGoalStartDate] = React.useState();
   const [goalEndDate, setGoalEndDate] = React.useState();
 
@@ -37,45 +45,47 @@ const AddTodoScreen = () => {
 
   const [tags, setTags] = React.useState<string[]>([]);
 
+  const handleIsRepeatToggle = () => {
+    setIsRepeat(prev => !prev);
+  };
+
   return (
     <View>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
       <TickTockTextInput label="할일" value={title} onChangeText={setTitle} placeholder="할일" />
-      <TickTockButton
-        title="날짜선택"
-        onPress={() => {
-          setModalState(
-            true,
-            '날짜선택',
-            '',
-            <Calendar
-              // Customize the appearance of the calendar
-              style={styles.calendarStyle}
-              // Specify the current date
-              current={'2012-03-01'}
-              // Callback that gets called when the user selects a day
-              onDayPress={day => {
-                console.log('selected day', day);
-              }}
-              theme={styles.calendarStyles}
-              // Mark specific dates as marked
-              markedDates={{
-                '2012-03-01': { selected: true, marked: true, selectedColor: 'blue' },
-                '2012-03-02': { selected: true, marked: true, selectedColor: 'blue' },
-                '2012-03-03': { selected: true, marked: true, selectedColor: 'blue' },
-              }}
-            />,
-            '죽기',
-            '죽기',
-            () => {
-              removeModal();
-            },
-            () => {
-              removeModal();
-            },
-          );
-        }}
-      />
+      <View>
+        <TickTockButton
+          title="날짜선택"
+          onPress={() => {
+            setModalState(
+              true,
+              '날짜선택',
+              '',
+              <Calendar
+                style={styles.calendarStyle}
+                current={today}
+                onDayPress={day => {
+                  console.log('selected day', day);
+                }}
+                theme={styles.calendarStyles}
+                markedDates={{}}
+              />,
+              '죽기',
+              '죽기',
+              () => {
+                removeModal();
+              },
+              () => {
+                removeModal();
+              },
+            );
+          }}
+        />
+      </View>
+      <View style={styles.isRepeatWrapper}>
+        <Text>반복</Text>
+        <TickTockToggleButton value={isRepeat} onValueChange={handleIsRepeatToggle} />
+      </View>
     </View>
   );
 };
@@ -96,5 +106,10 @@ const styles = StyleSheet.create(theme => ({
     // todayTextColor: '#00adf5',
     // dayTextColor: '#2d4150',
     // textDisabledColor: '#dd99ee',
+  },
+  isRepeatWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 }));
