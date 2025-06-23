@@ -14,8 +14,12 @@ import TickTockToggleButton from '@components/TickTockToggleButton';
 import { Font } from '@styles/font';
 import { BASIC_TODO_DAY, BASIC_WEEK } from '@entities/todo';
 import { SCREEN_WIDTH } from '@utils/public';
+import DatePicker from 'react-native-date-picker';
+
+import TimeIcon from '@assets/images/icon_time.svg';
 
 const AddTodoScreen = () => {
+  const date = new Date();
   const today = moment().format('YYYY-MM-DD');
   const navigation = useNavigation<LoggedInStackNavigationProp>();
   const handleBackNavigtion = () => {
@@ -41,6 +45,12 @@ const AddTodoScreen = () => {
 
   const [basicDayValue, setBasicDayValue] = React.useState<number>(0);
 
+  const [isTimeSet, setIsTimeSet] = React.useState<boolean>(false);
+  const [isStartTimeModal, setIsStartTimeModal] = React.useState<boolean>(false);
+  const [selectedStartTime, setSelectedStartTime] = React.useState<Date>(new Date());
+  const [isEndTimeModal, setIsEndTimeModal] = React.useState<boolean>(true);
+  const [selectedEndTime, setSelectedEndTime] = React.useState<Date>(new Date());
+
   const [isRepeat, setIsRepeat] = React.useState<boolean>(false);
   const [isEveryDay, setIsEveryDay] = React.useState<boolean>(false);
 
@@ -52,8 +62,6 @@ const AddTodoScreen = () => {
     ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[]
   >([]);
 
-  const [timeset, setTimeSet] = React.useState<string>();
-
   const [tags, setTags] = React.useState<string[]>([]);
 
   const handleIsRepeatToggle = () => {
@@ -63,12 +71,12 @@ const AddTodoScreen = () => {
     setIsRepeat(prev => !prev);
   };
 
-  const handleIsEveryDayToggle = () => {
-    setIsEveryDay(prev => !prev);
+  const handleIsTimeSetToggle = () => {
+    setIsTimeSet(prev => !prev);
   };
 
-  const handleIsTodayToggle = () => {
-    setIsToday(prev => !prev);
+  const handleIsEveryDayToggle = () => {
+    setIsEveryDay(prev => !prev);
   };
 
   const handleBasicDayToggle = (value: number) => {
@@ -86,10 +94,9 @@ const AddTodoScreen = () => {
     <View style={styles.container}>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
       <TickTockTextInput label="제목" value={title} onChangeText={setTitle} placeholder="제목" />
-      <View style={styles.basicTodoWrapper}>
-        {!isRepeat &&
-          !isEveryDay &&
-          BASIC_TODO_DAY.map((basicEl, basicIndex) => (
+      {!isRepeat && !isEveryDay && (
+        <View style={styles.basicTodoWrapper}>
+          {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
             <Pressable
               key={basicEl.value}
               onPress={() => handleBasicDayToggle(basicEl.value)}
@@ -97,7 +104,8 @@ const AddTodoScreen = () => {
               <Text>{basicEl.name}</Text>
             </Pressable>
           ))}
-      </View>
+        </View>
+      )}
       {basicDayValue === 5 && (
         <View>
           <Calendar
@@ -111,6 +119,31 @@ const AddTodoScreen = () => {
           />
         </View>
       )}
+      <View style={styles.isRepeatWrapper}>
+        <Text style={styles.categoryStyle}>시간 설정</Text>
+        <TickTockToggleButton value={isTimeSet} onValueChange={handleIsTimeSetToggle} />
+      </View>
+      <Text style={styles.categoryStyle}>시작 시간</Text>
+      <Pressable
+        onPress={() => setIsStartTimeModal(prev => !prev)}
+        style={styles.timePressBtnStyle}>
+        <View>
+          <Text>
+            {selectedStartTime ? moment(selectedStartTime).format('HH:mm') : '시작 시간 선택'}
+          </Text>
+        </View>
+        <TimeIcon />
+      </Pressable>
+      <Text style={styles.categoryStyle}>종료 시간</Text>
+      <Pressable onPress={() => setIsEndTimeModal(prev => !prev)} style={styles.timePressBtnStyle}>
+        <View>
+          <Text>
+            {selectedEndTime ? moment(selectedEndTime).format('HH:mm') : '시작 시간 선택'}
+          </Text>
+        </View>
+        <TimeIcon />
+      </Pressable>
+
       {!isRepeat && (
         <View style={styles.isRepeatWrapper}>
           <Text style={styles.categoryStyle}>매일 반복 일정 여부</Text>
@@ -138,6 +171,25 @@ const AddTodoScreen = () => {
           </View>
         </>
       )}
+      <DatePicker
+        modal
+        title={'시간을 선택하세요'}
+        date={selectedStartTime ? selectedStartTime : date}
+        is24hourSource="locale"
+        locale="en_GB"
+        minuteInterval={15}
+        onConfirm={(select: Date) => {
+          const selectedTime = moment(select).format('HH:mm:ss');
+          console.log(select);
+          setSelectedEndTime(select);
+          setIsStartTimeModal(false);
+        }}
+        onCancel={() => setIsStartTimeModal(false)}
+        mode={'time'}
+        confirmText="설정"
+        cancelText="취소"
+        open={isStartTimeModal}
+      />
     </View>
   );
 };
@@ -208,5 +260,33 @@ const styles = StyleSheet.create(theme => ({
   }),
   categoryStyle: {
     ...Font.bodyMediumBold,
+  },
+
+  timePressBtnStyle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+
+  dateTimeWrapper: {
+    marginVertical: 16,
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#282829',
+    borderRadius: 8,
+  },
+  dateTimeInnerStyle: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  selectBtnTextStyle: {
+    ...Font.bodyMediumBold,
+    color: theme.colors.text.primary,
   },
 }));
