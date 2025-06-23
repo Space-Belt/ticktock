@@ -30,7 +30,6 @@ const styles = StyleSheet.create(theme => ({
     justifyContent: 'space-between',
     paddingVertical: 8,
     marginBottom: 16,
-    paddingHorizontal: 16,
   },
   iconStyle: {
     color: theme.colors.text.primary,

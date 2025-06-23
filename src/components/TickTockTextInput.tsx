@@ -38,7 +38,7 @@ const TickTockTextInput: React.FC<InputProps> = ({
 const styles = StyleSheet.create(theme => ({
   inputContainer: {
     marginBottom: 20,
-    paddingHorizontal: 10,
+    // paddingHorizontal: 10,
   },
   label: {
     ...Font.bodySmallExtraBold,
