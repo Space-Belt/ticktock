@@ -1,4 +1,4 @@
-import { Alert, Text, View } from 'react-native';
+import { Alert, Pressable, Text, View } from 'react-native';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import TickTockMainStackHeader from '@components/TickTockMainStackHeader';
@@ -11,6 +11,9 @@ import { useModal } from '@stores/zustand/modal';
 import { Calendar } from 'react-native-calendars';
 import moment from 'moment';
 import TickTockToggleButton from '@components/TickTockToggleButton';
+import { Font } from '@styles/font';
+import { BASIC_TODO_DAY, BASIC_WEEK } from '@entities/todo';
+import { SCREEN_WIDTH } from '@utils/public';
 
 const AddTodoScreen = () => {
   const today = moment().format('YYYY-MM-DD');
@@ -34,7 +37,11 @@ const AddTodoScreen = () => {
   const setModalState = useModal(state => state.setModalState);
   const removeModal = useModal(state => state.removeModal);
 
-  const [isRepeat, setIsRepeat] = React.useState(false);
+  const [isToday, setIsToday] = React.useState<boolean>(true);
+
+  const [basicDayValue, setBasicDayValue] = React.useState<number>(0);
+
+  const [isRepeat, setIsRepeat] = React.useState<boolean>(false);
   const [repeat, setRepeat] = React.useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('daily');
   const [repeatStartDate, setRepeatStartDate] = React.useState();
   const [repeatEndDate, setRepeatEndDate] = React.useState();
@@ -48,44 +55,58 @@ const AddTodoScreen = () => {
   const handleIsRepeatToggle = () => {
     setIsRepeat(prev => !prev);
   };
+  const handleIsTodayToggle = () => {
+    setIsToday(prev => !prev);
+  };
+  const handleBasicDayToggle = (value: number) => {
+    setBasicDayValue(value);
+  };
 
   return (
-    <View>
+    <View style={styles.container}>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
       <TickTockTextInput label="할일" value={title} onChangeText={setTitle} placeholder="할일" />
-      <View>
-        <TickTockButton
-          title="날짜선택"
-          onPress={() => {
-            setModalState(
-              true,
-              '날짜선택',
-              '',
-              <Calendar
-                style={styles.calendarStyle}
-                current={today}
-                onDayPress={day => {
-                  console.log('selected day', day);
-                }}
-                theme={styles.calendarStyles}
-                markedDates={{}}
-              />,
-              '죽기',
-              '죽기',
-              () => {
-                removeModal();
-              },
-              () => {
-                removeModal();
-              },
-            );
-          }}
-        />
+      <View style={styles.basicTodoWrapper}>
+        {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
+          <Pressable
+            key={basicIndex}
+            onPress={() => handleBasicDayToggle(basicEl.value)}
+            style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
+            <Text>{basicEl.name}</Text>
+          </Pressable>
+        ))}
       </View>
+      {basicDayValue === 5 && (
+        <View>
+          <Calendar
+            style={styles.calendarStyle}
+            current={today}
+            onDayPress={day => {
+              console.log('selected day', day);
+            }}
+            theme={styles.calendarStyles}
+            markedDates={{}}
+          />
+        </View>
+      )}
       <View style={styles.isRepeatWrapper}>
-        <Text>반복</Text>
+        <Text style={styles.categoryStyle}>반복 여부</Text>
         <TickTockToggleButton value={isRepeat} onValueChange={handleIsRepeatToggle} />
       </View>
+
+      {isRepeat && (
+        <>
+          <View style={styles.basicTodoWrapper}>
+            {BASIC_WEEK.map((weekEl, weekIndex) => (
+              <Pressable
+                onPress={() => handleBasicDayToggle(weekEl.value)}
+                style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
+                <Text>{basicEl.name}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </>
+      )}
     </View>
   );
 };
@@ -93,9 +114,15 @@ const AddTodoScreen = () => {
 export default AddTodoScreen;
 
 const styles = StyleSheet.create(theme => ({
+  container: {
+    paddingHorizontal: 16,
+  },
   calendarStyle: {
     backgroundColor: theme.colors.background.primary,
     height: 350,
+  },
+  basicTodoWrapper: {
+    flexDirection: 'row',
   },
   calendarStyles: {
     backgroundColor: theme.colors.background.primary,
@@ -107,9 +134,27 @@ const styles = StyleSheet.create(theme => ({
     // dayTextColor: '#2d4150',
     // textDisabledColor: '#dd99ee',
   },
+  basicTodoElement: (isSelected: boolean) => ({
+    width: 55,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: theme.colors.border.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+    backgroundColor: isSelected
+      ? theme.colors.background.secondary
+      : theme.colors.background.overlay,
+    marginBottom: 16,
+  }),
   isRepeatWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  categoryStyle: {
+    ...Font.bodyMediumBold,
   },
 }));
