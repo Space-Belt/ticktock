@@ -174,21 +174,25 @@ const AddTodoScreen = () => {
       <DatePicker
         modal
         title={'시간을 선택하세요'}
-        date={selectedStartTime ? selectedStartTime : date}
+        date={isStartTimeModal ? selectedStartTime : selectedEndTime}
         is24hourSource="locale"
         locale="en_GB"
         minuteInterval={15}
         onConfirm={(select: Date) => {
           const selectedTime = moment(select).format('HH:mm:ss');
-          console.log(select);
-          setSelectedEndTime(select);
-          setIsStartTimeModal(false);
+          if (isStartTimeModal) {
+            setSelectedStartTime(select);
+            setIsStartTimeModal(false);
+          } else {
+            setSelectedEndTime(select);
+            setIsEndTimeModal(false);
+          }
         }}
-        onCancel={() => setIsStartTimeModal(false)}
+        onCancel={() => (isStartTimeModal ? setIsStartTimeModal(false) : setIsEndTimeModal(false))}
         mode={'time'}
         confirmText="설정"
         cancelText="취소"
-        open={isStartTimeModal}
+        open={isStartTimeModal || isEndTimeModal}
       />
     </View>
   );
