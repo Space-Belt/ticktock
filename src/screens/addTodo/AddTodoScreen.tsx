@@ -64,24 +64,20 @@ const AddTodoScreen = () => {
 
   const [tags, setTags] = React.useState<string[]>([]);
 
-  const handleIsRepeatToggle = () => {
-    if (isRepeat) {
-      setRepeatDays([]);
-    }
-    setIsRepeat(prev => !prev);
-  };
+  const [settingAlarm, setSettingAlarm] = React.useState<boolean>(false);
 
-  const handleIsTimeSetToggle = () => {
-    setIsTimeSet(prev => !prev);
-  };
-
-  const handleIsEveryDayToggle = () => {
-    setIsEveryDay(prev => !prev);
-  };
-
-  const handleBasicDayToggle = (value: number) => {
+  const handleBasicDay = (value: number) => {
     setBasicDayValue(value);
   };
+
+  const toggleButton = (
+    setValue: React.Dispatch<React.SetStateAction<boolean>>,
+    callBack?: () => void,
+  ) => {
+    setValue(prev => !prev);
+    callBack && callBack();
+  };
+
   const handleRepeatWeek = (value: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun') => {
     if (repeatDays.includes(value)) {
       setRepeatDays(prev => prev.filter(el => el !== value));
@@ -99,7 +95,7 @@ const AddTodoScreen = () => {
           {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
             <Pressable
               key={basicEl.value}
-              onPress={() => handleBasicDayToggle(basicEl.value)}
+              onPress={() => handleBasicDay(basicEl.value)}
               style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
               <Text>{basicEl.name}</Text>
             </Pressable>
@@ -121,41 +117,58 @@ const AddTodoScreen = () => {
       )}
       <View style={styles.isRepeatWrapper}>
         <Text style={styles.categoryStyle}>시간 설정</Text>
-        <TickTockToggleButton value={isTimeSet} onValueChange={handleIsTimeSetToggle} />
+        <TickTockToggleButton value={isTimeSet} onValueChange={() => toggleButton(setIsTimeSet)} />
       </View>
-      <Text style={styles.categoryStyle}>시작 시간</Text>
-      <Pressable
-        onPress={() => setIsStartTimeModal(prev => !prev)}
-        style={styles.timePressBtnStyle}>
-        <View>
-          <Text>
-            {selectedStartTime ? moment(selectedStartTime).format('HH:mm') : '시작 시간 선택'}
-          </Text>
-        </View>
-        <TimeIcon />
-      </Pressable>
-      <Text style={styles.categoryStyle}>종료 시간</Text>
-      <Pressable onPress={() => setIsEndTimeModal(prev => !prev)} style={styles.timePressBtnStyle}>
-        <View>
-          <Text>
-            {selectedEndTime ? moment(selectedEndTime).format('HH:mm') : '시작 시간 선택'}
-          </Text>
-        </View>
-        <TimeIcon />
-      </Pressable>
+      {isTimeSet && (
+        <>
+          <Text style={styles.categoryStyle}>시작 시간</Text>
+          <Pressable
+            onPress={() => setIsStartTimeModal(prev => !prev)}
+            style={styles.timePressBtnStyle}>
+            <View>
+              <Text>
+                {selectedStartTime ? moment(selectedStartTime).format('HH:mm') : '시작 시간 선택'}
+              </Text>
+            </View>
+            <TimeIcon />
+          </Pressable>
+          <Text style={styles.categoryStyle}>종료 시간</Text>
+          <Pressable
+            onPress={() => setIsEndTimeModal(prev => !prev)}
+            style={styles.timePressBtnStyle}>
+            <View>
+              <Text>
+                {selectedEndTime ? moment(selectedEndTime).format('HH:mm') : '시작 시간 선택'}
+              </Text>
+            </View>
+            <TimeIcon />
+          </Pressable>
+        </>
+      )}
 
       {!isRepeat && (
         <View style={styles.isRepeatWrapper}>
           <Text style={styles.categoryStyle}>매일 반복 일정 여부</Text>
-          <TickTockToggleButton value={isEveryDay} onValueChange={handleIsEveryDayToggle} />
+          <TickTockToggleButton
+            value={isEveryDay}
+            onValueChange={() => toggleButton(setIsEveryDay)}
+          />
         </View>
       )}
       {!isEveryDay && (
         <View style={styles.isRepeatWrapper}>
           <Text style={styles.categoryStyle}>매주 반복 일정 여부</Text>
-          <TickTockToggleButton value={isRepeat} onValueChange={handleIsRepeatToggle} />
+          <TickTockToggleButton value={isRepeat} onValueChange={() => toggleButton(setIsRepeat)} />
         </View>
       )}
+
+      <View style={styles.isRepeatWrapper}>
+        <Text style={styles.categoryStyle}>알림 설정</Text>
+        <TickTockToggleButton
+          value={settingAlarm}
+          onValueChange={() => toggleButton(setSettingAlarm)}
+        />
+      </View>
 
       {isRepeat && (
         <>
