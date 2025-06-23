@@ -42,6 +42,8 @@ const AddTodoScreen = () => {
   const [basicDayValue, setBasicDayValue] = React.useState<number>(0);
 
   const [isRepeat, setIsRepeat] = React.useState<boolean>(false);
+  const [isEveryDay, setIsEveryDay] = React.useState<boolean>(false);
+
   const [repeat, setRepeat] = React.useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('daily');
   const [repeatStartDate, setRepeatStartDate] = React.useState();
   const [repeatEndDate, setRepeatEndDate] = React.useState();
@@ -55,11 +57,20 @@ const AddTodoScreen = () => {
   const [tags, setTags] = React.useState<string[]>([]);
 
   const handleIsRepeatToggle = () => {
+    if (isRepeat) {
+      setRepeatDays([]);
+    }
     setIsRepeat(prev => !prev);
   };
+
+  const handleIsEveryDayToggle = () => {
+    setIsEveryDay(prev => !prev);
+  };
+
   const handleIsTodayToggle = () => {
     setIsToday(prev => !prev);
   };
+
   const handleBasicDayToggle = (value: number) => {
     setBasicDayValue(value);
   };
@@ -76,14 +87,16 @@ const AddTodoScreen = () => {
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
       <TickTockTextInput label="제목" value={title} onChangeText={setTitle} placeholder="제목" />
       <View style={styles.basicTodoWrapper}>
-        {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
-          <Pressable
-            key={basicIndex}
-            onPress={() => handleBasicDayToggle(basicEl.value)}
-            style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
-            <Text>{basicEl.name}</Text>
-          </Pressable>
-        ))}
+        {!isRepeat &&
+          !isEveryDay &&
+          BASIC_TODO_DAY.map((basicEl, basicIndex) => (
+            <Pressable
+              key={basicEl.value}
+              onPress={() => handleBasicDayToggle(basicEl.value)}
+              style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
+              <Text>{basicEl.name}</Text>
+            </Pressable>
+          ))}
       </View>
       {basicDayValue === 5 && (
         <View>
@@ -98,10 +111,18 @@ const AddTodoScreen = () => {
           />
         </View>
       )}
-      <View style={styles.isRepeatWrapper}>
-        <Text style={styles.categoryStyle}>반복 여부</Text>
-        <TickTockToggleButton value={isRepeat} onValueChange={handleIsRepeatToggle} />
-      </View>
+      {!isRepeat && (
+        <View style={styles.isRepeatWrapper}>
+          <Text style={styles.categoryStyle}>매일 반복 일정 여부</Text>
+          <TickTockToggleButton value={isEveryDay} onValueChange={handleIsEveryDayToggle} />
+        </View>
+      )}
+      {!isEveryDay && (
+        <View style={styles.isRepeatWrapper}>
+          <Text style={styles.categoryStyle}>매주 반복 일정 여부</Text>
+          <TickTockToggleButton value={isRepeat} onValueChange={handleIsRepeatToggle} />
+        </View>
+      )}
 
       {isRepeat && (
         <>
@@ -178,7 +199,7 @@ const styles = StyleSheet.create(theme => ({
     borderRadius: 17.5,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: isSelected ? theme.colors.background.overlay : theme.colors.background.card,
+    backgroundColor: isSelected ? theme.colors.background.overlay : theme.colors.background.primary,
   }),
   repeatTextStyle: (isSelected: boolean) => ({
     fontSize: 12,
