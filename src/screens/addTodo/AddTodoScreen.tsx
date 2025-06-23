@@ -50,6 +50,8 @@ const AddTodoScreen = () => {
     ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[]
   >([]);
 
+  const [timeset, setTimeSet] = React.useState<string>();
+
   const [tags, setTags] = React.useState<string[]>([]);
 
   const handleIsRepeatToggle = () => {
@@ -61,11 +63,18 @@ const AddTodoScreen = () => {
   const handleBasicDayToggle = (value: number) => {
     setBasicDayValue(value);
   };
+  const handleRepeatWeek = (value: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun') => {
+    if (repeatDays.includes(value)) {
+      setRepeatDays(prev => prev.filter(el => el !== value));
+    } else {
+      setRepeatDays(prev => [...prev, value]);
+    }
+  };
 
   return (
     <View style={styles.container}>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
-      <TickTockTextInput label="할일" value={title} onChangeText={setTitle} placeholder="할일" />
+      <TickTockTextInput label="제목" value={title} onChangeText={setTitle} placeholder="제목" />
       <View style={styles.basicTodoWrapper}>
         {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
           <Pressable
@@ -96,12 +105,13 @@ const AddTodoScreen = () => {
 
       {isRepeat && (
         <>
-          <View style={styles.basicTodoWrapper}>
+          <View style={styles.repeatDaysWrapper}>
             {BASIC_WEEK.map((weekEl, weekIndex) => (
               <Pressable
-                onPress={() => handleBasicDayToggle(weekEl.value)}
-                style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
-                <Text>{basicEl.name}</Text>
+                key={weekEl.value}
+                onPress={() => handleRepeatWeek(weekEl.value)}
+                style={styles.repeatStyle(repeatDays.includes(weekEl.value))}>
+                <Text>{weekEl.name}</Text>
               </Pressable>
             ))}
           </View>
@@ -154,6 +164,27 @@ const styles = StyleSheet.create(theme => ({
     justifyContent: 'space-between',
     marginBottom: 16,
   },
+  repeatDaysWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  repeatStyle: (isSelected: boolean) => ({
+    width: 40,
+    height: 40,
+    borderWidth: 0.5,
+    borderColor: isSelected ? theme.colors.border.secondary : theme.colors.border.primary,
+    borderRadius: 17.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: isSelected ? theme.colors.background.overlay : theme.colors.background.card,
+  }),
+  repeatTextStyle: (isSelected: boolean) => ({
+    fontSize: 12,
+    color: isSelected ? theme.colors.text.primary : theme.colors.text.secondary,
+    fontFamily: isSelected ? 'NanumSquare Neo ExtraBold' : 'NanumSquare Neo Regular',
+  }),
   categoryStyle: {
     ...Font.bodyMediumBold,
   },

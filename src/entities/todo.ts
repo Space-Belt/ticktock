@@ -25,3 +25,64 @@ export interface ITodo {
 
   repeatDays?: ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[];
 }
+
+export const BASIC_TODO_DAY = [
+  {
+    name: '오늘',
+    value: 0,
+  },
+  {
+    name: '내일',
+    value: 1,
+  },
+  {
+    name: '모레',
+    value: 2,
+  },
+  {
+    name: '글피',
+    value: 3,
+  },
+  {
+    name: '그글피',
+    value: 4,
+  },
+  {
+    name: '달력',
+    value: 5,
+  },
+];
+
+export const BASIC_WEEK: {
+  name: string;
+  value: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+}[] = [
+  {
+    name: '일',
+    value: 'sun',
+  },
+  {
+    name: '월',
+    value: 'mon',
+  },
+  {
+    name: '화',
+    value: 'tue',
+  },
+  {
+    name: '수',
+    value: 'wed',
+  },
+  {
+    name: '목',
+    value: 'thu',
+  },
+  {
+    name: '금',
+    value: 'fri',
+  },
+  {
+    name: '토',
+    value: 'sat',
+  },
+];
