@@ -38,6 +38,20 @@ const AddTodoScreen = () => {
   const [goalStartDate, setGoalStartDate] = React.useState();
   const [goalEndDate, setGoalEndDate] = React.useState();
 
+  const [selectedDates, setSelectedDates] = React.useState<string[]>([]);
+  const handleDayPress = (day: any) => {
+    const date = day.dateString;
+    setSelectedDates(prevSelectedDates =>
+      prevSelectedDates.includes(date)
+        ? prevSelectedDates.filter(d => d !== date)
+        : [...prevSelectedDates, date],
+    );
+  };
+  const markedDates = selectedDates.reduce((acc: any, date) => {
+    acc[date] = { selected: true, selectedColor: 'blue' };
+    return acc;
+  }, {});
+
   const setModalState = useModal(state => state.setModalState);
   const removeModal = useModal(state => state.removeModal);
 
@@ -86,6 +100,10 @@ const AddTodoScreen = () => {
     }
   };
 
+  React.useEffect(() => {
+    console.log(selectedDates);
+  }, [selectedDates]);
+
   return (
     <View style={styles.container}>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
@@ -107,11 +125,9 @@ const AddTodoScreen = () => {
           <Calendar
             style={styles.calendarStyle}
             current={today}
-            onDayPress={day => {
-              console.log('selected day', day);
-            }}
+            onDayPress={day => handleDayPress(day)}
             theme={styles.calendarStyles}
-            markedDates={{}}
+            markedDates={markedDates}
           />
         </View>
       )}
@@ -162,14 +178,6 @@ const AddTodoScreen = () => {
         </View>
       )}
 
-      <View style={styles.isRepeatWrapper}>
-        <Text style={styles.categoryStyle}>알림 설정</Text>
-        <TickTockToggleButton
-          value={settingAlarm}
-          onValueChange={() => toggleButton(setSettingAlarm)}
-        />
-      </View>
-
       {isRepeat && (
         <>
           <View style={styles.repeatDaysWrapper}>
@@ -184,6 +192,14 @@ const AddTodoScreen = () => {
           </View>
         </>
       )}
+
+      <View style={styles.isRepeatWrapper}>
+        <Text style={styles.categoryStyle}>알림 설정</Text>
+        <TickTockToggleButton
+          value={settingAlarm}
+          onValueChange={() => toggleButton(setSettingAlarm)}
+        />
+      </View>
       <DatePicker
         modal
         title={'시간을 선택하세요'}
