@@ -9,11 +9,14 @@ import { Font } from '@styles/font';
 import moment from 'moment';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
-import { Calendar } from 'react-native-calendars';
+import { Calendar, DateData } from 'react-native-calendars';
 import DatePicker from 'react-native-date-picker';
 import { StyleSheet } from 'react-native-unistyles';
 
 import TimeIcon from '@assets/images/icon_time.svg';
+import AlarmOnIcon from '@assets/images/icon_alarm_on.svg';
+import AlarmOffIcon from '@assets/images/icon_alarm_off.svg';
+import StartEndTimePicker from './components/StartEndTimePicker';
 
 const AddTodoScreen = () => {
   const date = new Date();
@@ -28,12 +31,8 @@ const AddTodoScreen = () => {
   const [color, setColor] = React.useState('#000000');
   const [priority, setPriority] = React.useState(0);
 
-  // '2012-03-01': { selected: true, marked: true, selectedColor: 'blue' },
-  // '2012-03-02': { selected: true, marked: true, selectedColor: 'blue' },
-  // '2012-03-03': { selected: true, marked: true, selectedColor: 'blue' },
-
-  const [goalStartDate, setGoalStartDate] = React.useState();
-  const [goalEndDate, setGoalEndDate] = React.useState();
+  const [goalStartDate, setGoalStartDate] = React.useState<string | null>();
+  const [goalEndDate, setGoalEndDate] = React.useState<string | null>();
 
   const [selectedDates, setSelectedDates] = React.useState<string[]>([]);
   const handleDayPress = (day: any) => {
@@ -44,10 +43,50 @@ const AddTodoScreen = () => {
         : [...prevSelectedDates, date],
     );
   };
+  const handleStartDayToEndDayPress = (day: DateData) => {
+    const date = day.dateString;
+    if (!goalStartDate) {
+      setGoalStartDate(date);
+    } else if (!goalEndDate) {
+      if (date < goalStartDate) {
+        setGoalStartDate(date);
+        setGoalEndDate(null);
+      } else {
+        setGoalEndDate(date);
+      }
+    } else {
+      setGoalStartDate(date);
+      setGoalEndDate(null);
+    }
+  };
+
   const markedDates = selectedDates.reduce((acc: any, date) => {
     acc[date] = { selected: true, selectedColor: 'blue' };
     return acc;
   }, {});
+  const generateMarkedDates = () => {
+    const marked: any = {};
+
+    if (goalStartDate) {
+      marked[goalStartDate] = { selected: true, selectedColor: 'blue' };
+    }
+
+    if (goalEndDate) {
+      marked[goalEndDate] = { selected: true, selectedColor: 'blue' };
+    }
+
+    if (goalStartDate && goalEndDate) {
+      let start = new Date(goalStartDate);
+      let end = new Date(goalEndDate);
+      while (start <= end) {
+        const dateString = start.toISOString().split('T')[0];
+        marked[dateString] = { selected: true, selectedColor: 'blue' };
+        start.setDate(start.getDate() + 1);
+      }
+    }
+
+    return marked;
+  };
 
   const setModalState = useModal(state => state.setModalState);
   const removeModal = useModal(state => state.removeModal);
@@ -59,11 +98,13 @@ const AddTodoScreen = () => {
   const [isTimeSet, setIsTimeSet] = React.useState<boolean>(false);
   const [isStartTimeModal, setIsStartTimeModal] = React.useState<boolean>(false);
   const [selectedStartTime, setSelectedStartTime] = React.useState<Date>(new Date());
-  const [isEndTimeModal, setIsEndTimeModal] = React.useState<boolean>(true);
+  const [isEndTimeModal, setIsEndTimeModal] = React.useState<boolean>(false);
   const [selectedEndTime, setSelectedEndTime] = React.useState<Date>(new Date());
 
   const [isRepeat, setIsRepeat] = React.useState<boolean>(false);
   const [isEveryDay, setIsEveryDay] = React.useState<boolean>(false);
+
+  const [isStartToEnd, setIsStartToEnd] = React.useState<boolean>(false);
 
   const [repeat, setRepeat] = React.useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('daily');
   const [repeatStartDate, setRepeatStartDate] = React.useState();
@@ -104,7 +145,20 @@ const AddTodoScreen = () => {
   return (
     <View style={styles.container}>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
-      <TickTockTextInput label="제목" value={title} onChangeText={setTitle} placeholder="제목" />
+      <TickTockTextInput
+        textSubChildren={
+          <Pressable
+            onPress={() => {
+              setSettingAlarm(prev => !prev);
+            }}>
+            {settingAlarm ? <AlarmOnIcon /> : <AlarmOffIcon />}
+          </Pressable>
+        }
+        label="제목"
+        value={title}
+        onChangeText={setTitle}
+        placeholder="제목"
+      />
       {!isRepeat && !isEveryDay && (
         <View style={styles.basicTodoWrapper}>
           {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
@@ -119,12 +173,25 @@ const AddTodoScreen = () => {
       )}
       {basicDayValue === 5 && (
         <View>
+          <View style={styles.isRepeatWrapper}>
+            <Text style={styles.categoryStyle}>시작 종료 전체선택</Text>
+            <TickTockToggleButton
+              value={isStartToEnd}
+              onValueChange={() => toggleButton(setIsStartToEnd)}
+            />
+          </View>
           <Calendar
             style={styles.calendarStyle}
             current={today}
-            onDayPress={day => handleDayPress(day)}
+            onDayPress={day => {
+              if (isStartToEnd) {
+                handleStartDayToEndDayPress(day);
+              } else {
+                handleDayPress(day);
+              }
+            }}
             theme={styles.calendarStyles}
-            markedDates={markedDates}
+            markedDates={isStartToEnd ? generateMarkedDates() : markedDates}
           />
         </View>
       )}
@@ -197,57 +264,15 @@ const AddTodoScreen = () => {
           onValueChange={() => toggleButton(setSettingAlarm)}
         />
       </View>
-      <DatePicker
-        modal
-        title={'시간을 선택하세요'}
-        date={isStartTimeModal ? selectedStartTime : selectedEndTime}
-        is24hourSource="locale"
-        locale="en_GB"
-        minuteInterval={15}
-        onConfirm={(select: Date) => {
-          if (isStartTimeModal) {
-            if (select > selectedEndTime) {
-              setModalState(
-                true,
-                '안돼요',
-                '시작시간이 종료시간 이후일 수 없습니다.',
-                null,
-                '확인',
-                '',
-                () => {
-                  removeModal();
-                },
-                () => {},
-              );
-            } else {
-              setSelectedStartTime(select);
-              setIsStartTimeModal(false);
-            }
-          } else {
-            if (select < selectedStartTime) {
-              setModalState(
-                true,
-                '안돼요',
-                '종료시간이 시작시간 이후일 수 없습니다.',
-                null,
-                '확인',
-                '',
-                () => {
-                  removeModal();
-                },
-                () => {},
-              );
-            } else {
-              setSelectedEndTime(select);
-              setIsEndTimeModal(false);
-            }
-          }
-        }}
-        onCancel={() => (isStartTimeModal ? setIsStartTimeModal(false) : setIsEndTimeModal(false))}
-        mode={'time'}
-        confirmText="설정"
-        cancelText="취소"
-        open={isStartTimeModal || isEndTimeModal}
+      <StartEndTimePicker
+        isStartTimeModal={isStartTimeModal}
+        selectedStartTime={selectedStartTime}
+        isEndTimeModal={isEndTimeModal}
+        selectedEndTime={selectedEndTime}
+        setIsStartTimeModal={setIsStartTimeModal}
+        setSelectedStartTime={setSelectedStartTime}
+        setIsEndTimeModal={setIsEndTimeModal}
+        setSelectedEndTime={setSelectedEndTime}
       />
     </View>
   );
