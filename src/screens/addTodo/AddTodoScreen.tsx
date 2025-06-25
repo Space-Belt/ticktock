@@ -1,20 +1,17 @@
-import { Alert, Pressable, Text, View } from 'react-native';
-import React from 'react';
-import { StyleSheet } from 'react-native-unistyles';
 import TickTockMainStackHeader from '@components/TickTockMainStackHeader';
-import { useNavigation } from '@react-navigation/native';
-import { LoggedInStackNavigationProp } from '@navigations/loggedIn/LoggedInStackNavigator';
 import TickTockTextInput from '@components/TickTockTextInput';
-import ColorPicker from 'reanimated-color-picker';
-import TickTockButton from '@components/TickTockButton';
-import { useModal } from '@stores/zustand/modal';
-import { Calendar } from 'react-native-calendars';
-import moment from 'moment';
 import TickTockToggleButton from '@components/TickTockToggleButton';
-import { Font } from '@styles/font';
 import { BASIC_TODO_DAY, BASIC_WEEK } from '@entities/todo';
-import { SCREEN_WIDTH } from '@utils/public';
+import { LoggedInStackNavigationProp } from '@navigations/loggedIn/LoggedInStackNavigator';
+import { useNavigation } from '@react-navigation/native';
+import { useModal } from '@stores/zustand/modal';
+import { Font } from '@styles/font';
+import moment from 'moment';
+import React from 'react';
+import { Pressable, Text, View } from 'react-native';
+import { Calendar } from 'react-native-calendars';
 import DatePicker from 'react-native-date-picker';
+import { StyleSheet } from 'react-native-unistyles';
 
 import TimeIcon from '@assets/images/icon_time.svg';
 
@@ -208,13 +205,42 @@ const AddTodoScreen = () => {
         locale="en_GB"
         minuteInterval={15}
         onConfirm={(select: Date) => {
-          const selectedTime = moment(select).format('HH:mm:ss');
           if (isStartTimeModal) {
-            setSelectedStartTime(select);
-            setIsStartTimeModal(false);
+            if (select > selectedEndTime) {
+              setModalState(
+                true,
+                '안돼요',
+                '시작시간이 종료시간 이후일 수 없습니다.',
+                null,
+                '확인',
+                '',
+                () => {
+                  removeModal();
+                },
+                () => {},
+              );
+            } else {
+              setSelectedStartTime(select);
+              setIsStartTimeModal(false);
+            }
           } else {
-            setSelectedEndTime(select);
-            setIsEndTimeModal(false);
+            if (select < selectedStartTime) {
+              setModalState(
+                true,
+                '안돼요',
+                '종료시간이 시작시간 이후일 수 없습니다.',
+                null,
+                '확인',
+                '',
+                () => {
+                  removeModal();
+                },
+                () => {},
+              );
+            } else {
+              setSelectedEndTime(select);
+              setIsEndTimeModal(false);
+            }
           }
         }}
         onCancel={() => (isStartTimeModal ? setIsStartTimeModal(false) : setIsEndTimeModal(false))}
