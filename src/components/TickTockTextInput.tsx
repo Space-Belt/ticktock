@@ -8,6 +8,7 @@ type InputProps = {
   value: string;
   onChangeText: (text: string) => void;
   placeholder: string;
+  textSubChildren?: React.ReactNode;
   errorMessage?: string;
 };
 
@@ -16,11 +17,15 @@ const TickTockTextInput: React.FC<InputProps> = ({
   value,
   onChangeText,
   placeholder,
+  textSubChildren,
   errorMessage,
 }) => {
   return (
     <View style={styles.inputContainer}>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.titleSection}>
+        <Text style={styles.label}>{label}</Text>
+        {textSubChildren && textSubChildren}
+      </View>
       <TextInput
         style={[styles.input, errorMessage ? styles.inputError : null]}
         value={value}
@@ -40,10 +45,15 @@ const styles = StyleSheet.create(theme => ({
     marginBottom: 20,
     // paddingHorizontal: 10,
   },
+  titleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
   label: {
     ...Font.bodySmallExtraBold,
     color: theme.colors.text.primary,
-    marginBottom: 10,
     paddingLeft: 5,
   },
   input: {
