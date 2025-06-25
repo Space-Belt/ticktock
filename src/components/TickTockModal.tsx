@@ -38,7 +38,7 @@ const TickTockModal = (props: Props) => {
     };
   });
   const onModalContentPress = (e: GestureResponderEvent) => {
-    e.stopPropagation(); // 내부 클릭 이벤트 전파를 막음
+    e.stopPropagation();
   };
 
   React.useEffect(() => {
@@ -67,13 +67,16 @@ const TickTockModal = (props: Props) => {
           {modalState.title && <Text style={styles.titleStyle}>{modalState.title}</Text>}
           {modalState.content && <Text style={styles.contentStyle}>{modalState.content}</Text>}
           {modalState.children && modalState.children}
-          <View style={styles.buttonContainer}>
+          <View style={styles.buttonContainer(modalState.confirmText === undefined)}>
             {modalState.cancelText && (
-              <TickTockButton onPress={() => {}} title={modalState.cancelText} />
+              <TickTockButton onPress={() => modalState.onCancel} title={modalState.cancelText} />
             )}
             {modalState.confirmText && (
               <TickTockButton
-                onPress={() => {}}
+                onPress={() => {
+                  modalState.onConfirm;
+                  handleOutsideClick();
+                }}
                 buttonColor="primary"
                 title={modalState.confirmText}
               />
@@ -112,10 +115,10 @@ const styles = StyleSheet.create(theme => ({
     ...Font.bodySmallBold,
     marginTop: 16,
   },
-  buttonContainer: {
+  buttonContainer: (isOneButton: boolean) => ({
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: isOneButton ? 'space-between' : 'center',
     gap: 10,
     marginTop: 16,
-  },
+  }),
 }));
