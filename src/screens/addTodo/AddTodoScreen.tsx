@@ -10,12 +10,11 @@ import moment from 'moment';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
-import DatePicker from 'react-native-date-picker';
 import { StyleSheet } from 'react-native-unistyles';
 
-import TimeIcon from '@assets/images/icon_time.svg';
-import AlarmOnIcon from '@assets/images/icon_alarm_on.svg';
 import AlarmOffIcon from '@assets/images/icon_alarm_off.svg';
+import AlarmOnIcon from '@assets/images/icon_alarm_on.svg';
+import TimeIcon from '@assets/images/icon_time.svg';
 import StartEndTimePicker from './components/StartEndTimePicker';
 
 const AddTodoScreen = () => {
@@ -141,6 +140,14 @@ const AddTodoScreen = () => {
   React.useEffect(() => {
     console.log(selectedDates);
   }, [selectedDates]);
+  React.useEffect(() => {
+    if (!isStartToEnd) {
+      setGoalStartDate(null);
+      setGoalEndDate(null);
+    } else {
+      setSelectedDates([]);
+    }
+  }, [isStartToEnd]);
 
   return (
     <View style={styles.container}>
