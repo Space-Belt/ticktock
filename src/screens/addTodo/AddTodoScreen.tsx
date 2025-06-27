@@ -16,6 +16,7 @@ import AlarmOffIcon from '@assets/images/icon_alarm_off.svg';
 import AlarmOnIcon from '@assets/images/icon_alarm_on.svg';
 import TimeIcon from '@assets/images/icon_time.svg';
 import StartEndTimePicker from './components/StartEndTimePicker';
+import ToggleButton from './components/ToggleButton';
 
 const AddTodoScreen = () => {
   const date = new Date();
@@ -180,13 +181,12 @@ const AddTodoScreen = () => {
       )}
       {basicDayValue === 5 && (
         <View>
-          <View style={styles.isRepeatWrapper}>
-            <Text style={styles.categoryStyle}>시작 종료 전체선택</Text>
-            <TickTockToggleButton
-              value={isStartToEnd}
-              onValueChange={() => toggleButton(setIsStartToEnd)}
-            />
-          </View>
+          <ToggleButton
+            title="시작 종료 전체선택"
+            setToggleStatus={setIsStartToEnd}
+            toggleStatus={isStartToEnd}
+          />
+
           <Calendar
             style={styles.calendarStyle}
             current={today}
@@ -202,10 +202,9 @@ const AddTodoScreen = () => {
           />
         </View>
       )}
-      <View style={styles.isRepeatWrapper}>
-        <Text style={styles.categoryStyle}>시간 설정</Text>
-        <TickTockToggleButton value={isTimeSet} onValueChange={() => toggleButton(setIsTimeSet)} />
-      </View>
+
+      <ToggleButton title="시간 설정" setToggleStatus={setIsTimeSet} toggleStatus={isTimeSet} />
+
       {isTimeSet && (
         <>
           <Text style={styles.categoryStyle}>시작 시간</Text>
@@ -234,19 +233,18 @@ const AddTodoScreen = () => {
       )}
 
       {!isRepeat && (
-        <View style={styles.isRepeatWrapper}>
-          <Text style={styles.categoryStyle}>매일 반복 일정 여부</Text>
-          <TickTockToggleButton
-            value={isEveryDay}
-            onValueChange={() => toggleButton(setIsEveryDay)}
-          />
-        </View>
+        <ToggleButton
+          title="매일 반복 일정 여부"
+          setToggleStatus={setIsEveryDay}
+          toggleStatus={isEveryDay}
+        />
       )}
       {!isEveryDay && (
-        <View style={styles.isRepeatWrapper}>
-          <Text style={styles.categoryStyle}>매주 반복 일정 여부</Text>
-          <TickTockToggleButton value={isRepeat} onValueChange={() => toggleButton(setIsRepeat)} />
-        </View>
+        <ToggleButton
+          title="매주 반복 일정 여부"
+          setToggleStatus={setIsRepeat}
+          toggleStatus={isRepeat}
+        />
       )}
 
       {isRepeat && (
@@ -263,14 +261,12 @@ const AddTodoScreen = () => {
           </View>
         </>
       )}
+      <ToggleButton
+        title="알림 설정"
+        setToggleStatus={setSettingAlarm}
+        toggleStatus={settingAlarm}
+      />
 
-      <View style={styles.isRepeatWrapper}>
-        <Text style={styles.categoryStyle}>알림 설정</Text>
-        <TickTockToggleButton
-          value={settingAlarm}
-          onValueChange={() => toggleButton(setSettingAlarm)}
-        />
-      </View>
       <StartEndTimePicker
         isStartTimeModal={isStartTimeModal}
         selectedStartTime={selectedStartTime}
