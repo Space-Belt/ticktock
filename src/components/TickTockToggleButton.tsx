@@ -31,12 +31,11 @@ const TickTockToggleButton: React.FC<TickTockToggleButtonProps> = ({
 
   const backgroundColorInterpolation = switchAnimation.interpolate({
     inputRange: [-0.5, 1.5],
-    outputRange: [theme.colors.border.primary, theme.colors.border.card],
+    outputRange: [theme.colors.border.primary, '#f5f'],
   });
 
   const translateXInterpolation = switchAnimation.interpolate({
     inputRange: [0, 1],
-    // outputRange: [2, 22],
     outputRange: [-3, 28],
   });
 
