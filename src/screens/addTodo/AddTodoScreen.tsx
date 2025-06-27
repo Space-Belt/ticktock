@@ -8,7 +8,7 @@ import { useModal } from '@stores/zustand/modal';
 import { Font } from '@styles/font';
 import moment from 'moment';
 import React from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, View } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { StyleSheet } from 'react-native-unistyles';
 
@@ -17,8 +17,13 @@ import AlarmOnIcon from '@assets/images/icon_alarm_on.svg';
 import TimeIcon from '@assets/images/icon_time.svg';
 import StartEndTimePicker from './components/StartEndTimePicker';
 import ToggleButton from './components/ToggleButton';
+import TickTockButton from '@components/TickTockButton';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SCREEN_WIDTH } from '@utils/public';
 
 const AddTodoScreen = () => {
+  const { bottom } = useSafeAreaInsets();
+
   const date = new Date();
   const today = moment().format('YYYY-MM-DD');
   const navigation = useNavigation<LoggedInStackNavigationProp>();
@@ -88,11 +93,6 @@ const AddTodoScreen = () => {
     return marked;
   };
 
-  const setModalState = useModal(state => state.setModalState);
-  const removeModal = useModal(state => state.removeModal);
-
-  const [isToday, setIsToday] = React.useState<boolean>(true);
-
   const [basicDayValue, setBasicDayValue] = React.useState<number>(0);
 
   const [isTimeSet, setIsTimeSet] = React.useState<boolean>(false);
@@ -122,14 +122,6 @@ const AddTodoScreen = () => {
     setBasicDayValue(value);
   };
 
-  const toggleButton = (
-    setValue: React.Dispatch<React.SetStateAction<boolean>>,
-    callBack?: () => void,
-  ) => {
-    setValue(prev => !prev);
-    callBack && callBack();
-  };
-
   const handleRepeatWeek = (value: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun') => {
     if (repeatDays.includes(value)) {
       setRepeatDays(prev => prev.filter(el => el !== value));
@@ -151,7 +143,7 @@ const AddTodoScreen = () => {
   }, [isStartToEnd]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
       <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
       <TickTockTextInput
         textSubChildren={
@@ -179,7 +171,7 @@ const AddTodoScreen = () => {
           ))}
         </View>
       )}
-      {basicDayValue === 5 && (
+      {basicDayValue === 5 && !isEveryDay && (
         <View>
           <ToggleButton
             title="시작 종료 전체선택"
@@ -212,7 +204,7 @@ const AddTodoScreen = () => {
             onPress={() => setIsStartTimeModal(prev => !prev)}
             style={styles.timePressBtnStyle}>
             <View>
-              <Text>
+              <Text style={styles.timeTextStyle}>
                 {selectedStartTime ? moment(selectedStartTime).format('HH:mm') : '시작 시간 선택'}
               </Text>
             </View>
@@ -223,7 +215,7 @@ const AddTodoScreen = () => {
             onPress={() => setIsEndTimeModal(prev => !prev)}
             style={styles.timePressBtnStyle}>
             <View>
-              <Text>
+              <Text style={styles.timeTextStyle}>
                 {selectedEndTime ? moment(selectedEndTime).format('HH:mm') : '시작 시간 선택'}
               </Text>
             </View>
@@ -277,7 +269,10 @@ const AddTodoScreen = () => {
         setIsEndTimeModal={setIsEndTimeModal}
         setSelectedEndTime={setSelectedEndTime}
       />
-    </View>
+      <View style={styles.buttonWrapper(bottom)}>
+        <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -285,7 +280,11 @@ export default AddTodoScreen;
 
 const styles = StyleSheet.create(theme => ({
   container: {
+    flex: 1,
     paddingHorizontal: 16,
+  },
+  contentContainerStyle: {
+    flex: 1,
   },
   calendarStyle: {
     backgroundColor: theme.colors.background.primary,
@@ -348,13 +347,16 @@ const styles = StyleSheet.create(theme => ({
   categoryStyle: {
     ...Font.bodyMediumBold,
   },
-
+  timeTextStyle: {
+    ...Font.bodySmallBold,
+  },
   timePressBtnStyle: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 8,
     marginBottom: 16,
+    paddingVertical: 10,
   },
 
   dateTimeWrapper: {
@@ -376,4 +378,9 @@ const styles = StyleSheet.create(theme => ({
     ...Font.bodyMediumBold,
     color: theme.colors.text.primary,
   },
+  buttonWrapper: (bottom: number) => ({
+    // ...StyleSheet.absoluteFillObject,
+    position: 'absolute',
+    bottom: bottom,
+  }),
 }));
