@@ -33,7 +33,7 @@ const StartEndTimePicker = ({
       date={isStartTimeModal ? selectedStartTime : selectedEndTime}
       is24hourSource="locale"
       locale="en_GB"
-      minuteInterval={15}
+      minuteInterval={1}
       onConfirm={(select: Date) => {
         if (isStartTimeModal) {
           if (select > selectedEndTime) {
