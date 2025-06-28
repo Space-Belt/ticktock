@@ -7,14 +7,21 @@ import { TODO_COLORS } from '@entities/todo';
 type Props = {
   selectedColor: string;
   setSelectedColor: React.Dispatch<React.SetStateAction<string>>;
+  0;
+  setColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const SelectColor = ({ selectedColor, setSelectedColor }: Props) => {
+const SelectColor = ({ selectedColor, setSelectedColor, setColorPicker }: Props) => {
   return (
     <View>
       <View style={styles.colorWrapper}>
         <Text style={styles.categoryStyle}>색상 선택</Text>
-        <Pressable style={styles.selectedColorStyle(selectedColor)} />
+        <Pressable
+          onPress={() => setColorPicker(prev => !prev)}
+          style={styles.selectedColorWrapper}>
+          <Text style={styles.customTextStyle}>직접 선택</Text>
+          <View style={styles.selectedColorStyle(selectedColor)} />
+        </Pressable>
       </View>
       <View style={styles.colorWrapper}>
         {TODO_COLORS.map(colorEl => (
@@ -39,8 +46,16 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
     borderRadius: 17.5,
-    color: color,
+    backgroundColor: color,
   }),
+  selectedColorWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  customTextStyle: {
+    ...Font.bodySmallBold,
+    marginRight: 8,
+  },
   colorsStyle: (color: string, selected: boolean) => ({
     backgroundColor: color,
     width: 35,
