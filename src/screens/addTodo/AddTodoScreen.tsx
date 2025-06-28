@@ -1,7 +1,7 @@
 import TickTockMainStackHeader from '@components/TickTockMainStackHeader';
 import TickTockTextInput from '@components/TickTockTextInput';
 import TickTockToggleButton from '@components/TickTockToggleButton';
-import { BASIC_TODO_DAY, BASIC_WEEK } from '@entities/todo';
+import { BASIC_TODO_DAY, BASIC_WEEK, REPEAT_LIST } from '@entities/todo';
 import { LoggedInStackNavigationProp } from '@navigations/loggedIn/LoggedInStackNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { useModal } from '@stores/zustand/modal';
@@ -20,6 +20,10 @@ import ToggleButton from './components/ToggleButton';
 import TickTockButton from '@components/TickTockButton';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SCREEN_WIDTH } from '@utils/public';
+import DayAndRepeatPicker from './components/DayAndRepeatPicker';
+import SelectColor from './components/SelectColor';
+
+const BOTTOM_BUTTON_HEIGHT = 45;
 
 const AddTodoScreen = () => {
   const { bottom } = useSafeAreaInsets();
@@ -33,7 +37,7 @@ const AddTodoScreen = () => {
 
   const [title, setTitle] = React.useState('');
 
-  const [color, setColor] = React.useState('#000000');
+  const [color, setColor] = React.useState('#F9C9D2');
   const [priority, setPriority] = React.useState(0);
 
   const [goalStartDate, setGoalStartDate] = React.useState<string | null>();
@@ -106,10 +110,10 @@ const AddTodoScreen = () => {
 
   const [isStartToEnd, setIsStartToEnd] = React.useState<boolean>(false);
 
-  const [repeat, setRepeat] = React.useState<'daily' | 'weekly' | 'monthly' | 'yearly'>('daily');
+  const [repeat, setRepeat] = React.useState<string>('daily');
+
   const [repeatStartDate, setRepeatStartDate] = React.useState();
   const [repeatEndDate, setRepeatEndDate] = React.useState();
-  const [repeatInterval, setRepeatInterval] = React.useState(1);
   const [repeatDays, setRepeatDays] = React.useState<
     ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[]
   >([]);
@@ -142,123 +146,140 @@ const AddTodoScreen = () => {
     }
   }, [isStartToEnd]);
 
+  React.useEffect(() => {
+    if (basicDayValue === -1) {
+      setBasicDayValue(0);
+    }
+  }, [basicDayValue]);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
-      <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
-      <TickTockTextInput
-        textSubChildren={
-          <Pressable
-            onPress={() => {
-              setSettingAlarm(prev => !prev);
-            }}>
-            {settingAlarm ? <AlarmOnIcon /> : <AlarmOffIcon />}
-          </Pressable>
-        }
-        label="제목"
-        value={title}
-        onChangeText={setTitle}
-        placeholder="제목"
-      />
-      {!isRepeat && !isEveryDay && (
-        <View style={styles.basicTodoWrapper}>
-          {BASIC_TODO_DAY.map((basicEl, basicIndex) => (
+    <View style={styles.wholeContainer(BOTTOM_BUTTON_HEIGHT + bottom)}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
+        <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
+        <TickTockTextInput
+          textSubChildren={
             <Pressable
-              key={basicEl.value}
-              onPress={() => handleBasicDay(basicEl.value)}
-              style={styles.basicTodoElement(basicDayValue === basicEl.value)}>
-              <Text>{basicEl.name}</Text>
+              onPress={() => {
+                setSettingAlarm(prev => !prev);
+              }}>
+              {settingAlarm ? <AlarmOnIcon /> : <AlarmOffIcon />}
             </Pressable>
-          ))}
-        </View>
-      )}
-      {basicDayValue === 5 && !isEveryDay && (
-        <View>
-          <ToggleButton
-            title="시작 종료 전체선택"
-            setToggleStatus={setIsStartToEnd}
-            toggleStatus={isStartToEnd}
-          />
-
-          <Calendar
-            style={styles.calendarStyle}
-            current={today}
-            onDayPress={day => {
-              if (isStartToEnd) {
-                handleStartDayToEndDayPress(day);
-              } else {
-                handleDayPress(day);
-              }
+          }
+          label="제목"
+          value={title}
+          onChangeText={setTitle}
+          placeholder="제목"
+        />
+        {!isRepeat && !isEveryDay && (
+          <DayAndRepeatPicker
+            selectNumberDataObject={{
+              value: basicDayValue,
+              setValue: setBasicDayValue,
+              mappingData: BASIC_TODO_DAY,
             }}
-            theme={styles.calendarStyles}
-            markedDates={isStartToEnd ? generateMarkedDates() : markedDates}
           />
-        </View>
-      )}
+        )}
+        {basicDayValue !== 5 && !isRepeat && (
+          <ToggleButton
+            title="매일 반복"
+            setToggleStatus={setIsEveryDay}
+            toggleStatus={isEveryDay}
+          />
+        )}
 
-      <ToggleButton title="시간 설정" setToggleStatus={setIsTimeSet} toggleStatus={isTimeSet} />
+        {basicDayValue === 5 && !isEveryDay && (
+          <View>
+            <ToggleButton
+              title="시작 종료 전체선택"
+              setToggleStatus={setIsStartToEnd}
+              toggleStatus={isStartToEnd}
+            />
 
-      {isTimeSet && (
-        <>
-          <Text style={styles.categoryStyle}>시작 시간</Text>
-          <Pressable
-            onPress={() => setIsStartTimeModal(prev => !prev)}
-            style={styles.timePressBtnStyle}>
-            <View>
-              <Text style={styles.timeTextStyle}>
-                {selectedStartTime ? moment(selectedStartTime).format('HH:mm') : '시작 시간 선택'}
-              </Text>
-            </View>
-            <TimeIcon />
-          </Pressable>
-          <Text style={styles.categoryStyle}>종료 시간</Text>
-          <Pressable
-            onPress={() => setIsEndTimeModal(prev => !prev)}
-            style={styles.timePressBtnStyle}>
-            <View>
-              <Text style={styles.timeTextStyle}>
-                {selectedEndTime ? moment(selectedEndTime).format('HH:mm') : '시작 시간 선택'}
-              </Text>
-            </View>
-            <TimeIcon />
-          </Pressable>
-        </>
-      )}
-
-      {!isRepeat && (
-        <ToggleButton
-          title="매일 반복 일정 여부"
-          setToggleStatus={setIsEveryDay}
-          toggleStatus={isEveryDay}
-        />
-      )}
-      {!isEveryDay && (
-        <ToggleButton
-          title="매주 반복 일정 여부"
-          setToggleStatus={setIsRepeat}
-          toggleStatus={isRepeat}
-        />
-      )}
-
-      {isRepeat && (
-        <>
-          <View style={styles.repeatDaysWrapper}>
-            {BASIC_WEEK.map((weekEl, weekIndex) => (
-              <Pressable
-                key={weekEl.value}
-                onPress={() => handleRepeatWeek(weekEl.value)}
-                style={styles.repeatStyle(repeatDays.includes(weekEl.value))}>
-                <Text>{weekEl.name}</Text>
-              </Pressable>
-            ))}
+            <Calendar
+              style={styles.calendarStyle}
+              current={today}
+              onDayPress={day => {
+                if (isStartToEnd) {
+                  handleStartDayToEndDayPress(day);
+                } else {
+                  handleDayPress(day);
+                }
+              }}
+              theme={styles.calendarStyles}
+              markedDates={isStartToEnd ? generateMarkedDates() : markedDates}
+            />
+            {!isStartToEnd && (
+              <>
+                <Text style={styles.repeatCategory}>반복</Text>
+                <DayAndRepeatPicker
+                  selectStringDataObject={{
+                    value: repeat,
+                    setValue: setRepeat,
+                    mappingData: REPEAT_LIST,
+                  }}
+                />
+              </>
+            )}
           </View>
-        </>
-      )}
-      <ToggleButton
-        title="알림 설정"
-        setToggleStatus={setSettingAlarm}
-        toggleStatus={settingAlarm}
-      />
+        )}
 
+        <ToggleButton title="시간 설정" setToggleStatus={setIsTimeSet} toggleStatus={isTimeSet} />
+
+        {isTimeSet && (
+          <>
+            <Text style={styles.categoryStyle}>시작 시간</Text>
+            <Pressable
+              onPress={() => setIsStartTimeModal(prev => !prev)}
+              style={styles.timePressBtnStyle}>
+              <View>
+                <Text style={styles.timeTextStyle}>
+                  {selectedStartTime ? moment(selectedStartTime).format('HH:mm') : '시작 시간 선택'}
+                </Text>
+              </View>
+              <TimeIcon />
+            </Pressable>
+            <Text style={styles.categoryStyle}>종료 시간</Text>
+            <Pressable
+              onPress={() => setIsEndTimeModal(prev => !prev)}
+              style={styles.timePressBtnStyle}>
+              <View>
+                <Text style={styles.timeTextStyle}>
+                  {selectedEndTime ? moment(selectedEndTime).format('HH:mm') : '시작 시간 선택'}
+                </Text>
+              </View>
+              <TimeIcon />
+            </Pressable>
+          </>
+        )}
+        {!isEveryDay && (
+          <ToggleButton
+            title="매주 반복 일정"
+            setToggleStatus={setIsRepeat}
+            toggleStatus={isRepeat}
+          />
+        )}
+
+        {isRepeat && (
+          <View>
+            {/* <ToggleButton title="매주 반복" setToggleStatus={setIsRepeat} toggleStatus={isRepeat} /> */}
+            <View style={styles.repeatDaysWrapper}>
+              {BASIC_WEEK.map((weekEl, weekIndex) => (
+                <Pressable
+                  key={weekEl.value}
+                  onPress={() => handleRepeatWeek(weekEl.value)}
+                  style={styles.repeatStyle(repeatDays.includes(weekEl.value))}>
+                  <Text>{weekEl.name}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        )}
+
+        <SelectColor selectedColor={color} setSelectedColor={setColor} />
+      </ScrollView>
+      <View style={styles.buttonWrapper(bottom)}>
+        <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
+      </View>
       <StartEndTimePicker
         isStartTimeModal={isStartTimeModal}
         selectedStartTime={selectedStartTime}
@@ -269,16 +290,17 @@ const AddTodoScreen = () => {
         setIsEndTimeModal={setIsEndTimeModal}
         setSelectedEndTime={setSelectedEndTime}
       />
-      <View style={styles.buttonWrapper(bottom)}>
-        <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
-      </View>
-    </ScrollView>
+    </View>
   );
 };
 
 export default AddTodoScreen;
 
 const styles = StyleSheet.create(theme => ({
+  wholeContainer: (bottom: number) => ({
+    paddingBottom: bottom,
+    flex: 1,
+  }),
   container: {
     flex: 1,
     paddingHorizontal: 16,
@@ -288,7 +310,6 @@ const styles = StyleSheet.create(theme => ({
   },
   calendarStyle: {
     backgroundColor: theme.colors.background.primary,
-    height: 350,
   },
   basicTodoWrapper: {
     flexDirection: 'row',
@@ -381,6 +402,11 @@ const styles = StyleSheet.create(theme => ({
   buttonWrapper: (bottom: number) => ({
     // ...StyleSheet.absoluteFillObject,
     position: 'absolute',
+    marginHorizontal: 16,
     bottom: bottom,
   }),
+  repeatCategory: {
+    ...Font.bodyMediumBold,
+    marginVertical: 16,
+  },
 }));
