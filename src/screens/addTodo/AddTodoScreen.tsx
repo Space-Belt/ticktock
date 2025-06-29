@@ -30,6 +30,7 @@ import ColorPicker, {
   Preview,
   Swatches,
 } from 'reanimated-color-picker';
+import Animated, { runOnJS } from 'react-native-reanimated';
 
 const BOTTOM_BUTTON_HEIGHT = 45;
 
@@ -51,7 +52,7 @@ const AddTodoScreen = () => {
   const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false);
 
   const selectColor = (color: ColorFormatsObject) => {
-    // setColor(color.hex);
+    runOnJS(setColor)(color.hex);
   };
 
   const [priority, setPriority] = React.useState(0);
@@ -299,19 +300,19 @@ const AddTodoScreen = () => {
               true,
               '색 선택',
               '',
-              <View style={styles.whiteBox}>
-                <Text style={styles.title}>배경색 선택</Text>
-                <ColorPicker value="yellow" onComplete={color => selectColor(color)}>
+              <Animated.View>
+                <ColorPicker
+                  value={color}
+                  onCompleteJS={colorObj => {
+                    runOnJS(setColor)(colorObj.hex); // ✅ 핵심!
+                  }}>
                   <Preview />
                   <Panel1 />
                   <HueSlider />
                   <OpacitySlider />
                   <Swatches />
                 </ColorPicker>
-                <Pressable onPress={() => {}} style={styles.confirmBtn}>
-                  <Text style={styles.confirmBtnText}>선택하기</Text>
-                </Pressable>
-              </View>,
+              </Animated.View>,
               '',
               '',
               () => {},
