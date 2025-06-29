@@ -22,11 +22,21 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SCREEN_WIDTH } from '@utils/public';
 import DayAndRepeatPicker from './components/DayAndRepeatPicker';
 import SelectColor from './components/SelectColor';
+import ColorPicker, {
+  ColorFormatsObject,
+  HueSlider,
+  OpacitySlider,
+  Panel1,
+  Preview,
+  Swatches,
+} from 'reanimated-color-picker';
 
 const BOTTOM_BUTTON_HEIGHT = 45;
 
 const AddTodoScreen = () => {
   const { bottom } = useSafeAreaInsets();
+
+  const { setModalState } = useModal();
 
   const date = new Date();
   const today = moment().format('YYYY-MM-DD');
@@ -38,6 +48,12 @@ const AddTodoScreen = () => {
   const [title, setTitle] = React.useState('');
 
   const [color, setColor] = React.useState('#F9C9D2');
+  const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false);
+
+  const selectColor = (color: ColorFormatsObject) => {
+    // setColor(color.hex);
+  };
+
   const [priority, setPriority] = React.useState(0);
 
   const [goalStartDate, setGoalStartDate] = React.useState<string | null>();
@@ -275,7 +291,34 @@ const AddTodoScreen = () => {
           </View>
         )}
 
-        <SelectColor selectedColor={color} setSelectedColor={setColor} />
+        <SelectColor
+          selectedColor={color}
+          setSelectedColor={setColor}
+          setColorPicker={() => {
+            setModalState(
+              true,
+              '색 선택',
+              '',
+              <View style={styles.whiteBox}>
+                <Text style={styles.title}>배경색 선택</Text>
+                <ColorPicker value="yellow" onComplete={color => selectColor(color)}>
+                  <Preview />
+                  <Panel1 />
+                  <HueSlider />
+                  <OpacitySlider />
+                  <Swatches />
+                </ColorPicker>
+                <Pressable onPress={() => {}} style={styles.confirmBtn}>
+                  <Text style={styles.confirmBtnText}>선택하기</Text>
+                </Pressable>
+              </View>,
+              '',
+              '',
+              () => {},
+              () => {},
+            );
+          }}
+        />
       </ScrollView>
       <View style={styles.buttonWrapper(bottom)}>
         <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
@@ -408,5 +451,26 @@ const styles = StyleSheet.create(theme => ({
   repeatCategory: {
     ...Font.bodyMediumBold,
     marginVertical: 16,
+  },
+
+  whiteBox: {
+    backgroundColor: 'white',
+    borderRadius: 20,
+    elevation: 2,
+    overflow: 'hidden',
+  },
+  colorPickerStyle: {
+    borderRadius: 20,
+  },
+  confirmBtn: {
+    backgroundColor: theme.colors.button.primary,
+    paddingVertical: 20,
+    borderBottomRightRadius: 15,
+    borderBottomLeftRadius: 15,
+  },
+  confirmBtnText: {
+    fontSize: 14,
+    textAlign: 'center',
+    fontWeight: '700',
   },
 }));

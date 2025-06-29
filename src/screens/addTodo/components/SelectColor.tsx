@@ -7,8 +7,7 @@ import { TODO_COLORS } from '@entities/todo';
 type Props = {
   selectedColor: string;
   setSelectedColor: React.Dispatch<React.SetStateAction<string>>;
-  0;
-  setColorPicker: React.Dispatch<React.SetStateAction<boolean>>;
+  setColorPicker: () => void;
 };
 
 const SelectColor = ({ selectedColor, setSelectedColor, setColorPicker }: Props) => {
