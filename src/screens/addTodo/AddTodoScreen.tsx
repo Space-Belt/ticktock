@@ -1,7 +1,6 @@
 import TickTockMainStackHeader from '@components/TickTockMainStackHeader';
 import TickTockTextInput from '@components/TickTockTextInput';
-import TickTockToggleButton from '@components/TickTockToggleButton';
-import { BASIC_TODO_DAY, BASIC_WEEK, REPEAT_LIST } from '@entities/todo';
+import { BASIC_TODO_DAY, BASIC_WEEK, PRIORITY_LIST, REPEAT_LIST } from '@entities/todo';
 import { LoggedInStackNavigationProp } from '@navigations/loggedIn/LoggedInStackNavigator';
 import { useNavigation } from '@react-navigation/native';
 import { useModal } from '@stores/zustand/modal';
@@ -15,13 +14,10 @@ import { StyleSheet } from 'react-native-unistyles';
 import AlarmOffIcon from '@assets/images/icon_alarm_off.svg';
 import AlarmOnIcon from '@assets/images/icon_alarm_on.svg';
 import TimeIcon from '@assets/images/icon_time.svg';
-import StartEndTimePicker from './components/StartEndTimePicker';
-import ToggleButton from './components/ToggleButton';
 import TickTockButton from '@components/TickTockButton';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SCREEN_WIDTH } from '@utils/public';
-import DayAndRepeatPicker from './components/DayAndRepeatPicker';
-import SelectColor from './components/SelectColor';
+import { runOnJS } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ColorPicker, {
   ColorFormatsObject,
   HueSlider,
@@ -30,7 +26,10 @@ import ColorPicker, {
   Preview,
   Swatches,
 } from 'reanimated-color-picker';
-import Animated, { runOnJS } from 'react-native-reanimated';
+import DayAndRepeatPicker from './components/DayAndRepeatPicker';
+import SelectColor from './components/SelectColor';
+import StartEndTimePicker from './components/StartEndTimePicker';
+import ToggleButton from './components/ToggleButton';
 
 const BOTTOM_BUTTON_HEIGHT = 45;
 
@@ -55,7 +54,7 @@ const AddTodoScreen = () => {
     runOnJS(setColor)(color.hex);
   };
 
-  const [priority, setPriority] = React.useState(0);
+  const [priority, setPriority] = React.useState<number>(0);
 
   const [goalStartDate, setGoalStartDate] = React.useState<string | null>();
   const [goalEndDate, setGoalEndDate] = React.useState<string | null>();
@@ -291,7 +290,6 @@ const AddTodoScreen = () => {
             </View>
           </View>
         )}
-
         <SelectColor
           selectedColor={color}
           setSelectedColor={setColor}
@@ -300,24 +298,31 @@ const AddTodoScreen = () => {
               true,
               '색 선택',
               '',
-              <Animated.View>
-                <ColorPicker
-                  value={color}
-                  onCompleteJS={colorObj => {
-                    runOnJS(setColor)(colorObj.hex); // ✅ 핵심!
-                  }}>
-                  <Preview />
-                  <Panel1 />
-                  <HueSlider />
-                  <OpacitySlider />
-                  <Swatches />
-                </ColorPicker>
-              </Animated.View>,
+
+              <ColorPicker
+                value={color}
+                onCompleteJS={colorObj => {
+                  runOnJS(setColor)(colorObj.hex);
+                }}>
+                <Preview />
+                <Panel1 />
+                <HueSlider />
+                <OpacitySlider />
+                <Swatches />
+              </ColorPicker>,
               '',
               '',
               () => {},
               () => {},
             );
+          }}
+        />
+        <Text style={[styles.categoryStyle, styles.priorityStyle]}>우선도(선택)</Text>
+        <DayAndRepeatPicker
+          selectNumberDataObject={{
+            value: priority,
+            setValue: setPriority,
+            mappingData: PRIORITY_LIST,
           }}
         />
       </ScrollView>
@@ -411,6 +416,10 @@ const styles = StyleSheet.create(theme => ({
   }),
   categoryStyle: {
     ...Font.bodyMediumBold,
+  },
+  priorityStyle: {
+    marginBottom: 6,
+    marginTop: 16,
   },
   timeTextStyle: {
     ...Font.bodySmallBold,

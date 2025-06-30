@@ -52,6 +52,29 @@ export const BASIC_TODO_DAY = [
   },
 ];
 
+export const PRIORITY_LIST = [
+  {
+    name: '많이중요',
+    value: 1,
+  },
+  {
+    name: '중요',
+    value: 2,
+  },
+  {
+    name: '보통',
+    value: 3,
+  },
+  {
+    name: '덜중요',
+    value: 4,
+  },
+  {
+    name: '안중요',
+    value: 5,
+  },
+];
+
 export const REPEAT_LIST = [
   {
     name: '매월',
