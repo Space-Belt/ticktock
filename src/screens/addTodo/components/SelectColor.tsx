@@ -14,10 +14,8 @@ const SelectColor = ({ selectedColor, setSelectedColor, setColorPicker }: Props)
   return (
     <View>
       <View style={styles.colorWrapper}>
-        <Text style={styles.categoryStyle}>색상 선택</Text>
-        <Pressable
-          onPress={() => setColorPicker(prev => !prev)}
-          style={styles.selectedColorWrapper}>
+        <Text style={styles.categoryStyle}>색상(선택)</Text>
+        <Pressable onPress={setColorPicker} style={styles.selectedColorWrapper}>
           <Text style={styles.customTextStyle}>직접 선택</Text>
           <View style={styles.selectedColorStyle(selectedColor)} />
         </Pressable>
@@ -66,6 +64,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: 16,
+    marginTop: 6,
   },
 });
