@@ -36,7 +36,7 @@ const BOTTOM_BUTTON_HEIGHT = 45;
 const AddTodoScreen = () => {
   const { bottom } = useSafeAreaInsets();
 
-  const { setModalState } = useModal();
+  const { setModalState, removeModal } = useModal();
 
   const date = new Date();
   const today = moment().format('YYYY-MM-DD');
@@ -48,11 +48,6 @@ const AddTodoScreen = () => {
   const [title, setTitle] = React.useState('');
 
   const [color, setColor] = React.useState('#F9C9D2');
-  const [showColorPicker, setShowColorPicker] = React.useState<boolean>(false);
-
-  const selectColor = (color: ColorFormatsObject) => {
-    runOnJS(setColor)(color.hex);
-  };
 
   const [priority, setPriority] = React.useState<number>(0);
 
@@ -85,10 +80,13 @@ const AddTodoScreen = () => {
     }
   };
 
-  const markedDates = selectedDates.reduce((acc: any, date) => {
-    acc[date] = { selected: true, selectedColor: 'blue' };
-    return acc;
-  }, {});
+  const markedDates = React.useMemo(() => {
+    return selectedDates.reduce((acc: any, date) => {
+      acc[date] = { selected: true, selectedColor: 'blue' };
+      return acc;
+    }, {});
+  }, [selectedDates]);
+
   const generateMarkedDates = () => {
     const marked: any = {};
 
@@ -113,6 +111,12 @@ const AddTodoScreen = () => {
     return marked;
   };
 
+  const [isStartToEnd, setIsStartToEnd] = React.useState<boolean>(false);
+
+  const displayedMarkedDates = React.useMemo(() => {
+    return isStartToEnd ? generateMarkedDates() : markedDates;
+  }, [isStartToEnd, goalStartDate, goalEndDate, markedDates]);
+
   const [basicDayValue, setBasicDayValue] = React.useState<number>(0);
 
   const [isTimeSet, setIsTimeSet] = React.useState<boolean>(false);
@@ -123,8 +127,6 @@ const AddTodoScreen = () => {
 
   const [isRepeat, setIsRepeat] = React.useState<boolean>(false);
   const [isEveryDay, setIsEveryDay] = React.useState<boolean>(false);
-
-  const [isStartToEnd, setIsStartToEnd] = React.useState<boolean>(false);
 
   const [repeat, setRepeat] = React.useState<string>('daily');
 
@@ -168,8 +170,57 @@ const AddTodoScreen = () => {
     }
   }, [basicDayValue]);
 
+  React.useEffect(() => {
+    if (basicDayValue === 5) {
+      setModalState(
+        true,
+        '날짜 선택',
+        '',
+        <Calendar
+          style={styles.calendarStyle}
+          current={today}
+          onDayPress={day => {
+            if (isStartToEnd) {
+              handleStartDayToEndDayPress(day);
+            } else {
+              handleDayPress(day);
+            }
+          }}
+          theme={styles.calendarStyles}
+          markedDates={isStartToEnd ? generateMarkedDates() : markedDates}
+        />,
+        '확인',
+        '취소',
+        () => {
+          setModalState(
+            false,
+            '',
+            '',
+            null,
+            '',
+            '',
+            () => {},
+            () => {},
+          );
+        },
+        () => {
+          setModalState(
+            false,
+            '',
+            '',
+            null,
+            '',
+            '',
+            () => {},
+            () => {},
+          );
+        },
+      );
+    }
+  }, [basicDayValue, isStartToEnd, markedDates]);
+
   return (
-    <View style={styles.wholeContainer(BOTTOM_BUTTON_HEIGHT + bottom)}>
+    <View style={styles.wholeContainer}>
       <ScrollView style={styles.container} contentContainerStyle={styles.contentContainerStyle}>
         <TickTockMainStackHeader handleNavigation={handleBackNavigtion} />
         <TickTockTextInput
@@ -211,19 +262,6 @@ const AddTodoScreen = () => {
               toggleStatus={isStartToEnd}
             />
 
-            <Calendar
-              style={styles.calendarStyle}
-              current={today}
-              onDayPress={day => {
-                if (isStartToEnd) {
-                  handleStartDayToEndDayPress(day);
-                } else {
-                  handleDayPress(day);
-                }
-              }}
-              theme={styles.calendarStyles}
-              markedDates={isStartToEnd ? generateMarkedDates() : markedDates}
-            />
             {!isStartToEnd && (
               <>
                 <Text style={styles.repeatCategory}>반복</Text>
@@ -325,10 +363,10 @@ const AddTodoScreen = () => {
             mappingData: PRIORITY_LIST,
           }}
         />
-      </ScrollView>
-      <View style={styles.buttonWrapper(bottom)}>
+        {/* <View style={styles.buttonWrapper(bottom)}> */}
         <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
-      </View>
+        {/* </View> */}
+      </ScrollView>
       <StartEndTimePicker
         isStartTimeModal={isStartTimeModal}
         selectedStartTime={selectedStartTime}
@@ -346,16 +384,17 @@ const AddTodoScreen = () => {
 export default AddTodoScreen;
 
 const styles = StyleSheet.create(theme => ({
-  wholeContainer: (bottom: number) => ({
-    paddingBottom: bottom,
+  wholeContainer: {
+    paddingBottom: 100,
     flex: 1,
-  }),
+  },
   container: {
     flex: 1,
     paddingHorizontal: 16,
   },
   contentContainerStyle: {
     flex: 1,
+    // marginBottom: bottom,
   },
   calendarStyle: {
     backgroundColor: theme.colors.background.primary,
