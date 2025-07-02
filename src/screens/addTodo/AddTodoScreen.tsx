@@ -130,8 +130,6 @@ const AddTodoScreen = () => {
 
   const [repeat, setRepeat] = React.useState<string>('daily');
 
-  const [repeatStartDate, setRepeatStartDate] = React.useState();
-  const [repeatEndDate, setRepeatEndDate] = React.useState();
   const [repeatDays, setRepeatDays] = React.useState<
     ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[]
   >([]);
@@ -139,10 +137,6 @@ const AddTodoScreen = () => {
   const [tags, setTags] = React.useState<string[]>([]);
 
   const [settingAlarm, setSettingAlarm] = React.useState<boolean>(false);
-
-  const handleBasicDay = (value: number) => {
-    setBasicDayValue(value);
-  };
 
   const handleRepeatWeek = (value: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun') => {
     if (repeatDays.includes(value)) {
@@ -176,48 +170,37 @@ const AddTodoScreen = () => {
         true,
         '날짜 선택',
         '',
-        <Calendar
-          style={styles.calendarStyle}
-          current={today}
-          onDayPress={day => {
-            if (isStartToEnd) {
-              handleStartDayToEndDayPress(day);
-            } else {
-              handleDayPress(day);
-            }
-          }}
-          theme={styles.calendarStyles}
-          markedDates={isStartToEnd ? generateMarkedDates() : markedDates}
-        />,
-        '확인',
-        '취소',
+        <>
+          <Calendar
+            style={styles.calendarStyle}
+            current={today}
+            onDayPress={day => {
+              if (isStartToEnd) {
+                handleStartDayToEndDayPress(day);
+              } else {
+                handleDayPress(day);
+              }
+            }}
+            theme={styles.calendarStyles}
+            markedDates={displayedMarkedDates}
+          />
+          <ToggleButton
+            title="시작 종료 전체선택"
+            setToggleStatus={setIsStartToEnd}
+            toggleStatus={isStartToEnd}
+          />
+        </>,
+        '선택',
+        '',
         () => {
-          setModalState(
-            false,
-            '',
-            '',
-            null,
-            '',
-            '',
-            () => {},
-            () => {},
-          );
+          removeModal();
         },
         () => {
-          setModalState(
-            false,
-            '',
-            '',
-            null,
-            '',
-            '',
-            () => {},
-            () => {},
-          );
+          removeModal();
         },
       );
     }
-  }, [basicDayValue, isStartToEnd, markedDates]);
+  }, [basicDayValue, isStartToEnd, markedDates, displayedMarkedDates]);
 
   return (
     <View style={styles.wholeContainer}>
@@ -256,12 +239,6 @@ const AddTodoScreen = () => {
 
         {basicDayValue === 5 && !isEveryDay && (
           <View>
-            <ToggleButton
-              title="시작 종료 전체선택"
-              setToggleStatus={setIsStartToEnd}
-              toggleStatus={isStartToEnd}
-            />
-
             {!isStartToEnd && (
               <>
                 <Text style={styles.repeatCategory}>반복</Text>
