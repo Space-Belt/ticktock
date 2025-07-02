@@ -30,6 +30,7 @@ import DayAndRepeatPicker from './components/DayAndRepeatPicker';
 import SelectColor from './components/SelectColor';
 import StartEndTimePicker from './components/StartEndTimePicker';
 import ToggleButton from './components/ToggleButton';
+import CalendarModalComponent from './components/CalendarModalComponent';
 
 const BOTTOM_BUTTON_HEIGHT = 45;
 
@@ -64,22 +65,23 @@ const AddTodoScreen = () => {
         : [...prevSelectedDates, date],
     );
   };
-  const handleStartDayToEndDayPress = (day: DateData) => {
-    const date = day.dateString;
-    if (!goalStartDate) {
-      setGoalStartDate(date);
-    } else if (!goalEndDate) {
-      if (date < goalStartDate) {
-        setGoalStartDate(date);
-        setGoalEndDate(null);
-      } else {
-        setGoalEndDate(date);
-      }
-    } else {
-      setGoalStartDate(date);
-      setGoalEndDate(null);
-    }
-  };
+  // const handleStartDayToEndDayPress = (day: DateData) => {
+  //   const date = day.dateString;
+  //   if (!goalStartDate) {
+  //     setGoalStartDate(date);
+  //   } else if (!goalEndDate) {
+  //     if (date < goalStartDate) {
+  //       setGoalStartDate(date);
+  //       setGoalEndDate(null);
+  //     } else {
+  //       setGoalEndDate(date);
+  //     }
+  //   } else {
+  //     setGoalStartDate(date);
+  //     setGoalEndDate(null);
+  //   }
+
+  // };
 
   const markedDates = React.useMemo(() => {
     return selectedDates.reduce((acc: any, date) => {
@@ -147,47 +149,38 @@ const AddTodoScreen = () => {
     }
   };
 
-  const showCalendarModal = () => {
+  const onModalClose = () => {
+    setShowCalendar(false);
+    removeModal();
+  };
+
+  React.useEffect(() => {
+    if (!showCalendar) return; // 모달이 열려있을 때만
     setModalState(
       true,
       '날짜 선택',
       '',
-      <>
-        <Calendar
-          style={styles.calendarStyle}
-          current={today}
-          onDayPress={day => {
-            if (isStartToEnd) {
-              handleStartDayToEndDayPress(day);
-            } else {
-              handleDayPress(day);
-            }
-          }}
-          theme={styles.calendarStyles}
-          markedDates={displayedMarkedDates}
-        />
-        <ToggleButton
-          title="시작 종료 전체선택"
-          setToggleStatus={setIsStartToEnd}
-          toggleStatus={isStartToEnd}
-        />
-      </>,
+      <CalendarModalComponent
+        isStartToEnd={isStartToEnd}
+        goalStartDate={goalStartDate}
+        goalEndDate={goalEndDate}
+        setGoalStartDate={setGoalStartDate}
+        setGoalEndDate={setGoalEndDate}
+        setSelectedDates={setSelectedDates}
+        setIsStartToEnd={setIsStartToEnd}
+        displayedMarkedDates={displayedMarkedDates}
+      />,
       '선택',
       '',
-      () => {
-        setShowCalendar(false);
-        removeModal();
-      },
-      () => {
-        removeModal();
-      },
+      onModalClose,
+      onModalClose,
     );
     setBasicDayValue(-2);
-  };
+  }, [showCalendar, displayedMarkedDates, isStartToEnd, goalStartDate, goalEndDate]);
 
   React.useEffect(() => {
-    console.log(selectedDates);
-  }, [selectedDates]);
+    console.log(displayedMarkedDates);
+  }, [displayedMarkedDates]);
   React.useEffect(() => {
     if (!isStartToEnd) {
       setGoalStartDate(null);
@@ -231,7 +224,7 @@ const AddTodoScreen = () => {
             secondChild={
               <TouchableOpacity
                 onPress={() => {
-                  showCalendarModal();
+                  setShowCalendar(prev => !prev);
                 }}
                 style={styles.basicTodoElement(showCalendar)}>
                 <Text>달력선택</Text>
