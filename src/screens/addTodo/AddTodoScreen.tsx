@@ -7,7 +7,7 @@ import { useModal } from '@stores/zustand/modal';
 import { Font } from '@styles/font';
 import moment from 'moment';
 import React from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { Calendar, DateData } from 'react-native-calendars';
 import { StyleSheet } from 'react-native-unistyles';
 
@@ -51,6 +51,7 @@ const AddTodoScreen = () => {
 
   const [priority, setPriority] = React.useState<number>(0);
 
+  const [showCalendar, setShowCalendar] = React.useState<boolean>(false);
   const [goalStartDate, setGoalStartDate] = React.useState<string | null>();
   const [goalEndDate, setGoalEndDate] = React.useState<string | null>();
 
@@ -146,6 +147,44 @@ const AddTodoScreen = () => {
     }
   };
 
+  const showCalendarModal = () => {
+    setModalState(
+      true,
+      '날짜 선택',
+      '',
+      <>
+        <Calendar
+          style={styles.calendarStyle}
+          current={today}
+          onDayPress={day => {
+            if (isStartToEnd) {
+              handleStartDayToEndDayPress(day);
+            } else {
+              handleDayPress(day);
+            }
+          }}
+          theme={styles.calendarStyles}
+          markedDates={displayedMarkedDates}
+        />
+        <ToggleButton
+          title="시작 종료 전체선택"
+          setToggleStatus={setIsStartToEnd}
+          toggleStatus={isStartToEnd}
+        />
+      </>,
+      '선택',
+      '',
+      () => {
+        setShowCalendar(false);
+        removeModal();
+      },
+      () => {
+        removeModal();
+      },
+    );
+    setBasicDayValue(-2);
+  };
+
   React.useEffect(() => {
     console.log(selectedDates);
   }, [selectedDates]);
@@ -163,44 +202,6 @@ const AddTodoScreen = () => {
       setBasicDayValue(0);
     }
   }, [basicDayValue]);
-
-  React.useEffect(() => {
-    if (basicDayValue === 5) {
-      setModalState(
-        true,
-        '날짜 선택',
-        '',
-        <>
-          <Calendar
-            style={styles.calendarStyle}
-            current={today}
-            onDayPress={day => {
-              if (isStartToEnd) {
-                handleStartDayToEndDayPress(day);
-              } else {
-                handleDayPress(day);
-              }
-            }}
-            theme={styles.calendarStyles}
-            markedDates={displayedMarkedDates}
-          />
-          <ToggleButton
-            title="시작 종료 전체선택"
-            setToggleStatus={setIsStartToEnd}
-            toggleStatus={isStartToEnd}
-          />
-        </>,
-        '선택',
-        '',
-        () => {
-          removeModal();
-        },
-        () => {
-          removeModal();
-        },
-      );
-    }
-  }, [basicDayValue, isStartToEnd, markedDates, displayedMarkedDates]);
 
   return (
     <View style={styles.wholeContainer}>
@@ -227,6 +228,15 @@ const AddTodoScreen = () => {
               setValue: setBasicDayValue,
               mappingData: BASIC_TODO_DAY,
             }}
+            secondChild={
+              <TouchableOpacity
+                onPress={() => {
+                  showCalendarModal();
+                }}
+                style={styles.basicTodoElement(showCalendar)}>
+                <Text>달력선택</Text>
+              </TouchableOpacity>
+            }
           />
         )}
         {basicDayValue !== 5 && !isRepeat && (
@@ -292,7 +302,6 @@ const AddTodoScreen = () => {
 
         {isRepeat && (
           <View>
-            {/* <ToggleButton title="매주 반복" setToggleStatus={setIsRepeat} toggleStatus={isRepeat} /> */}
             <View style={styles.repeatDaysWrapper}>
               {BASIC_WEEK.map((weekEl, weekIndex) => (
                 <Pressable
@@ -313,7 +322,6 @@ const AddTodoScreen = () => {
               true,
               '색 선택',
               '',
-
               <ColorPicker
                 value={color}
                 onCompleteJS={colorObj => {
@@ -325,10 +333,14 @@ const AddTodoScreen = () => {
                 <OpacitySlider />
                 <Swatches />
               </ColorPicker>,
+              '선택',
               '',
-              '',
-              () => {},
-              () => {},
+              () => {
+                removeModal();
+              },
+              () => {
+                removeModal();
+              },
             );
           }}
         />
@@ -340,10 +352,10 @@ const AddTodoScreen = () => {
             mappingData: PRIORITY_LIST,
           }}
         />
-        {/* <View style={styles.buttonWrapper(bottom)}> */}
-        <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
-        {/* </View> */}
       </ScrollView>
+      <View style={styles.buttonWrapper(bottom)}>
+        <TickTockButton title="챌린지 생성" onPress={() => {}} width={SCREEN_WIDTH - 32} />
+      </View>
       <StartEndTimePicker
         isStartTimeModal={isStartTimeModal}
         selectedStartTime={selectedStartTime}
@@ -390,7 +402,7 @@ const styles = StyleSheet.create(theme => ({
     // textDisabledColor: '#dd99ee',
   },
   basicTodoElement: (isSelected: boolean) => ({
-    width: 55,
+    width: 60,
     height: 40,
     borderRadius: 20,
     borderWidth: 1,
@@ -398,9 +410,10 @@ const styles = StyleSheet.create(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 8,
-    backgroundColor: isSelected
-      ? theme.colors.background.secondary
-      : theme.colors.background.overlay,
+    backgroundColor: theme.colors.background.accent,
+    // backgroundColor: isSelected
+    //   ? theme.colors.background.secondary
+    //   : theme.colors.background.overlay,
     marginBottom: 16,
   }),
   isRepeatWrapper: {

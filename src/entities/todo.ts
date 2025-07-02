@@ -46,10 +46,6 @@ export const BASIC_TODO_DAY = [
     name: '그글피',
     value: 4,
   },
-  {
-    name: '달력',
-    value: 5,
-  },
 ];
 
 export const PRIORITY_LIST = [

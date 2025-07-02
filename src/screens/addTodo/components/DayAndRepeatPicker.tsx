@@ -13,9 +13,14 @@ type Props = {
     value: number;
     setValue: React.Dispatch<React.SetStateAction<number>>;
   };
+  secondChild?: React.ReactNode;
 };
 
-const DayAndRepeatPicker = ({ selectStringDataObject, selectNumberDataObject }: Props) => {
+const DayAndRepeatPicker = ({
+  selectStringDataObject,
+  selectNumberDataObject,
+  secondChild,
+}: Props) => {
   const basicData = selectNumberDataObject
     ? selectNumberDataObject.mappingData
     : selectStringDataObject && selectStringDataObject.mappingData;
@@ -32,16 +37,15 @@ const DayAndRepeatPicker = ({ selectStringDataObject, selectNumberDataObject }: 
           onPress={() => {
             if (selectStringDataObject) {
               if (selectStringDataObject.value === mappedEl.value) {
-                selectStringDataObject.setValue(''); // 선택 해제
+                selectStringDataObject.setValue('');
               } else {
-                selectStringDataObject.setValue(mappedEl.value as string); // 새 값 선택
+                selectStringDataObject.setValue(mappedEl.value as string);
               }
             } else if (selectNumberDataObject) {
-              // 이미 선택된 값이 있을 경우 선택 해제
               if (selectNumberDataObject.value === mappedEl.value) {
-                selectNumberDataObject.setValue(-1); // 선택 해제
+                selectNumberDataObject.setValue(-1);
               } else {
-                selectNumberDataObject.setValue(mappedEl.value as number); // 새 값 선택
+                selectNumberDataObject.setValue(mappedEl.value as number);
               }
             }
           }}
@@ -51,6 +55,7 @@ const DayAndRepeatPicker = ({ selectStringDataObject, selectNumberDataObject }: 
           <Text>{mappedEl.name}</Text>
         </Pressable>
       ))}
+      {secondChild && secondChild}
     </View>
   );
 };
@@ -69,7 +74,7 @@ const styles = StyleSheet.create(theme => ({
     borderColor: theme.colors.border.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: 5,
     backgroundColor: isSelected
       ? theme.colors.background.secondary
       : theme.colors.background.overlay,
