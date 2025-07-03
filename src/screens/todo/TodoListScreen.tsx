@@ -56,6 +56,14 @@ const TodoListScreen = (props: Props) => {
     transform: [{ translateX: translateX.value }],
   }));
 
+  React.useEffect(() => {
+    if (selectedPanel === 0) {
+      translateX.value = withSpring(0);
+    } else {
+      translateX.value = withSpring(-SCREEN_WIDTH);
+    }
+  }, [selectedPanel]);
+
   return (
     <ScrollView style={styles.container}>
       <TodoListHeader
