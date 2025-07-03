@@ -1,14 +1,23 @@
-import { ScrollView, Text, View } from 'react-native';
-import React from 'react';
-import { StyleSheet } from 'react-native-unistyles';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import TodoItem from './components/TodoItem';
+import CalendarIcon from '@assets/images/icon_calendar.svg';
+import TickTockPanel from '@components/TickTockPanel';
 import { ITodo } from '@entities/todo';
-import TickTockMainStackHeader from '@components/TickTockMainStackHeader';
-import TodoListHeader from './components/TodoListHeader';
 import { LoggedInStackNavigationProp } from '@navigations/loggedIn/LoggedInStackNavigator';
 import { useNavigation } from '@react-navigation/native';
-import TickTockPanel from '@components/TickTockPanel';
+import { Font } from '@styles/font';
+import { SCREEN_WIDTH } from '@utils/public';
+import React from 'react';
+import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, {
+  runOnJS,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
+import { StyleSheet } from 'react-native-unistyles';
+import RepeatLists from './components/RepeatLists';
+import TodayLists from './components/TodayLists';
+import TodoListHeader from './components/TodoListHeader';
 
 type Props = {};
 
@@ -22,21 +31,61 @@ const TodoListScreen = (props: Props) => {
 
   const [todoList, setTodoList] = React.useState<ITodo[]>([]);
 
-  const panGestureEvent = Gesture.Pan()
-    .onStart(() => {})
-    .onUpdate(event => {
-      console.log(event);
+  const translateX = useSharedValue(0);
+  const tempTranslateX = useSharedValue(0);
+
+  const panGesture = Gesture.Pan()
+    .onStart(event => {
+      tempTranslateX.value = translateX.value;
     })
-    .onEnd(event => {});
+    .onUpdate(event => {
+      const next = tempTranslateX.value + event.translationX;
+      translateX.value = Math.min(Math.max(next, -SCREEN_WIDTH), 0);
+    })
+    .onEnd(() => {
+      if (translateX.value < -SCREEN_WIDTH / 2) {
+        translateX.value = withSpring(-SCREEN_WIDTH);
+        runOnJS(handleChangePanel)(1);
+      } else {
+        translateX.value = withSpring(0);
+        runOnJS(handleChangePanel)(0);
+      }
+    });
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
+
   return (
     <ScrollView style={styles.container}>
-      <TodoListHeader handleNavigation={() => navigation.goBack()} />
+      <TodoListHeader
+        handleNavigation={() => navigation.goBack()}
+        children={
+          <Pressable
+            style={styles.calendarWrapper}
+            onPress={() => {
+              navigation.goBack();
+            }}>
+            <Text style={styles.calendarText}>달력</Text>
+            <CalendarIcon />
+          </Pressable>
+        }
+      />
       <TickTockPanel
-        panelList={[{ title: '오늘' }, { title: '반복' }, { title: '달력' }]}
+        panelList={[{ title: '오늘' }, { title: '반복' }]}
         selectedPanel={selectedPanel}
         handleChangePanel={handleChangePanel}
       />
-      <TodoItem />
+      <GestureDetector gesture={panGesture}>
+        <Animated.View style={[styles.pagerContainer, animatedStyle]}>
+          <View style={styles.page}>
+            <TodayLists />
+          </View>
+          <View style={styles.page}>
+            <RepeatLists />
+          </View>
+        </Animated.View>
+      </GestureDetector>
     </ScrollView>
   );
 };
@@ -46,5 +95,24 @@ export default TodoListScreen;
 const styles = StyleSheet.create(theme => ({
   container: {
     paddingHorizontal: 16,
+  },
+  calendarWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  calendarText: {
+    ...Font.bodySmallExtraBold,
+    color: theme.colors.text.primary,
+  },
+  gestureHandlerRootStyle: {
+    flex: 1,
+  },
+  pagerContainer: {
+    flexDirection: 'row',
+    width: SCREEN_WIDTH * 32, // 탭 개수만큼 넓이 확보
+  },
+  page: {
+    width: SCREEN_WIDTH, // 각 페이지는 화면 한 폭
   },
 }));

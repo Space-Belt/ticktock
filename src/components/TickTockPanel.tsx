@@ -85,8 +85,8 @@ const TickTockPanel = ({ panelList, selectedPanel, handleChangePanel, duration }
 const styles = StyleSheet.create(theme => ({
   tabContainer: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border.primary,
+    borderBottomWidth: 0.6,
+    borderBottomColor: theme.colors.button.success,
   },
   panelStyle: (selected: boolean) => ({
     color: selected ? theme.colors.text.primary : theme.colors.text.secondary,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create(theme => ({
     position: 'absolute',
     height: 43,
     borderBottomWidth: 1.5,
-    borderBottomColor: '#fff',
+    borderBottomColor: theme.colors.text.link,
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
@@ -113,7 +113,7 @@ const styles = StyleSheet.create(theme => ({
   tabStyle: { alignItems: 'center' },
   tabText: {
     ...Font.bodySmall,
-    color: '#E7E7E7',
+    color: theme.colors.text.primary,
     textAlign: 'center',
     lineHeight: 22,
   },
