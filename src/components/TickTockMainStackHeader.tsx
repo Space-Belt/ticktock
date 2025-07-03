@@ -3,8 +3,6 @@ import React from 'react';
 import { Pressable, View } from 'react-native';
 import { StyleSheet } from 'react-native-unistyles';
 
-import { LoggedInStackNavigationProp } from '@navigations/loggedIn/LoggedInStackNavigator';
-
 import BackIcon from '@assets/images/icon_chevron_left.svg';
 
 type Props = {

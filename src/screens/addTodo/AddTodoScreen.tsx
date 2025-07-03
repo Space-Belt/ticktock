@@ -8,7 +8,6 @@ import { Font } from '@styles/font';
 import moment from 'moment';
 import React from 'react';
 import { Pressable, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { Calendar, DateData } from 'react-native-calendars';
 import { StyleSheet } from 'react-native-unistyles';
 
 import AlarmOffIcon from '@assets/images/icon_alarm_off.svg';
@@ -19,18 +18,17 @@ import { SCREEN_WIDTH } from '@utils/public';
 import { runOnJS } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import ColorPicker, {
-  ColorFormatsObject,
   HueSlider,
   OpacitySlider,
   Panel1,
   Preview,
   Swatches,
 } from 'reanimated-color-picker';
+import CalendarModalComponent from './components/CalendarModalComponent';
 import DayAndRepeatPicker from './components/DayAndRepeatPicker';
 import SelectColor from './components/SelectColor';
 import StartEndTimePicker from './components/StartEndTimePicker';
 import ToggleButton from './components/ToggleButton';
-import CalendarModalComponent from './components/CalendarModalComponent';
 
 const BOTTOM_BUTTON_HEIGHT = 45;
 
@@ -38,9 +36,6 @@ const AddTodoScreen = () => {
   const { bottom } = useSafeAreaInsets();
 
   const { setModalState, removeModal } = useModal();
-
-  const date = new Date();
-  const today = moment().format('YYYY-MM-DD');
   const navigation = useNavigation<LoggedInStackNavigationProp>();
   const handleBackNavigtion = () => {
     navigation.goBack();
@@ -57,31 +52,6 @@ const AddTodoScreen = () => {
   const [goalEndDate, setGoalEndDate] = React.useState<string | null>();
 
   const [selectedDates, setSelectedDates] = React.useState<string[]>([]);
-  const handleDayPress = (day: any) => {
-    const date = day.dateString;
-    setSelectedDates(prevSelectedDates =>
-      prevSelectedDates.includes(date)
-        ? prevSelectedDates.filter(d => d !== date)
-        : [...prevSelectedDates, date],
-    );
-  };
-  // const handleStartDayToEndDayPress = (day: DateData) => {
-  //   const date = day.dateString;
-  //   if (!goalStartDate) {
-  //     setGoalStartDate(date);
-  //   } else if (!goalEndDate) {
-  //     if (date < goalStartDate) {
-  //       setGoalStartDate(date);
-  //       setGoalEndDate(null);
-  //     } else {
-  //       setGoalEndDate(date);
-  //     }
-  //   } else {
-  //     setGoalStartDate(date);
-  //     setGoalEndDate(null);
-  //   }
-
-  // };
 
   const markedDates = React.useMemo(() => {
     return selectedDates.reduce((acc: any, date) => {
@@ -137,8 +107,6 @@ const AddTodoScreen = () => {
     ('mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun')[]
   >([]);
 
-  const [tags, setTags] = React.useState<string[]>([]);
-
   const [settingAlarm, setSettingAlarm] = React.useState<boolean>(false);
 
   const handleRepeatWeek = (value: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun') => {
@@ -155,7 +123,7 @@ const AddTodoScreen = () => {
   };
 
   React.useEffect(() => {
-    if (!showCalendar) return; // 모달이 열려있을 때만
+    if (!showCalendar) return;
     setModalState(
       true,
       '날짜 선택',
@@ -178,9 +146,6 @@ const AddTodoScreen = () => {
     setBasicDayValue(-2);
   }, [showCalendar, displayedMarkedDates, isStartToEnd, goalStartDate, goalEndDate]);
 
-  React.useEffect(() => {
-    console.log(displayedMarkedDates);
-  }, [displayedMarkedDates]);
   React.useEffect(() => {
     if (!isStartToEnd) {
       setGoalStartDate(null);
