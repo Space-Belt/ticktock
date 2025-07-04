@@ -135,3 +135,79 @@ export const MOCK_DATA: ITodo[] = [
     repeatDays: ['tue', 'thu', 'fri'],
   },
 ];
+
+export const TODAY_TODOS: ITodo[] = [
+  // 1) 단발성 선택된 날짜(오늘)
+  {
+    id: '1',
+    title: 'Morning run',
+    completed: false,
+    created_at: '2025-06-20',
+    selectedDates: ['2025-07-04'],
+    completedDates: [], // 오늘 아직 완료 전
+    color: '#AED581',
+    priority: 3,
+  },
+
+  // 2) 기간 목표(오늘이 범위 안에 있음)
+  {
+    id: '2',
+    title: '7일 워크아웃 챌린지',
+    completed: false,
+    created_at: '2025-06-25',
+    goalStartDate: '2025-06-28',
+    goalEndDate: '2025-07-04', // 오늘이 종료일
+    color: '#FFE082',
+    priority: 2,
+  },
+
+  // 3) 매일 반복
+  {
+    id: '3',
+    title: '아침 명상',
+    completed: false,
+    created_at: '2025-01-01',
+    repeat: 'daily',
+    repeatStartDate: '2025-01-01',
+    repeatEndDate: '2025-12-31',
+    color: '#81D4FA',
+    priority: 1,
+  },
+
+  // 4) 매주 금요일 반복
+  {
+    id: '4',
+    title: '주간 회고 미팅',
+    completed: false,
+    created_at: '2025-02-01',
+    repeat: 'weekly',
+    repeatStartDate: '2025-02-01',
+    repeatEndDate: '2025-12-31',
+    repeatDays: ['fri'], // 금요일
+    color: '#CE93D8',
+  },
+
+  // 5) 매월 4일 반복
+  {
+    id: '5',
+    title: '월세 납부',
+    completed: false,
+    created_at: '2025-01-04',
+    repeat: 'monthly',
+    repeatStartDate: '2025-01-04', // 매월 4일
+    repeatEndDate: '2025-12-04',
+    color: '#FFAB91',
+  },
+
+  // 6) 매년 7월 4일 반복 (기념일)
+  {
+    id: '6',
+    title: '결혼 기념일',
+    completed: false,
+    created_at: '2025-07-04',
+    repeat: 'yearly',
+    repeatStartDate: '2025-07-04',
+    repeatEndDate: '2030-07-04',
+    color: '#F48FB1',
+  },
+];
