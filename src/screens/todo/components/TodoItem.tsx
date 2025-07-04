@@ -2,11 +2,19 @@ import { Text, View } from 'react-native';
 import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { ITodo } from '@entities/todo';
 
-type Props = {};
+type Props = {
+  todoItem: ITodo;
+};
 
-const TodoItem = (props: Props) => {
+const TodoItem = ({ todoItem }: Props) => {
   const panGesture = Gesture.Pan()
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-10, 10])
+    .onStart(e => {
+      console.log('onStart', e);
+    })
     .onUpdate(e => {
       // if (onLeft.value) {
       //   position.value = e.translationX;
@@ -27,11 +35,20 @@ const TodoItem = (props: Props) => {
 
   return (
     <GestureDetector gesture={panGesture}>
-      <Text>TodoListScreen</Text>
+      <View style={styles.container}>
+        <Text>{todoItem?.title ? todoItem.title : ''}</Text>
+      </View>
     </GestureDetector>
   );
 };
 
 export default TodoItem;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create(theme => ({
+  container: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border.primary,
+  },
+}));

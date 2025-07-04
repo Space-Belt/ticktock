@@ -35,6 +35,8 @@ const TodoListScreen = (props: Props) => {
   const tempTranslateX = useSharedValue(0);
 
   const panGesture = Gesture.Pan()
+    .activeOffsetX([-10, 10])
+    .failOffsetY([-10, 10])
     .onStart(event => {
       tempTranslateX.value = translateX.value;
     })
@@ -43,7 +45,7 @@ const TodoListScreen = (props: Props) => {
       translateX.value = Math.min(Math.max(next, -SCREEN_WIDTH), 0);
     })
     .onEnd(() => {
-      if (translateX.value < -SCREEN_WIDTH / 2) {
+      if (translateX.value < -SCREEN_WIDTH / 3) {
         translateX.value = withSpring(-SCREEN_WIDTH);
         runOnJS(handleChangePanel)(1);
       } else {
@@ -65,7 +67,7 @@ const TodoListScreen = (props: Props) => {
   }, [selectedPanel]);
 
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       <TodoListHeader
         handleNavigation={() => navigation.goBack()}
         children={
@@ -84,17 +86,19 @@ const TodoListScreen = (props: Props) => {
         selectedPanel={selectedPanel}
         handleChangePanel={handleChangePanel}
       />
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={[styles.pagerContainer, animatedStyle]}>
-          <View style={styles.page}>
-            <TodayLists />
-          </View>
-          <View style={styles.page}>
-            <RepeatLists />
-          </View>
-        </Animated.View>
-      </GestureDetector>
-    </ScrollView>
+      <ScrollView>
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={[styles.pagerContainer, animatedStyle]}>
+            <View style={styles.page}>
+              <TodayLists />
+            </View>
+            <View style={styles.page}>
+              <RepeatLists />
+            </View>
+          </Animated.View>
+        </GestureDetector>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -102,7 +106,7 @@ export default TodoListScreen;
 
 const styles = StyleSheet.create(theme => ({
   container: {
-    paddingHorizontal: 16,
+    // flex: 1,
   },
   calendarWrapper: {
     flexDirection: 'row',
@@ -118,9 +122,10 @@ const styles = StyleSheet.create(theme => ({
   },
   pagerContainer: {
     flexDirection: 'row',
-    width: SCREEN_WIDTH * 32, // 탭 개수만큼 넓이 확보
+    width: SCREEN_WIDTH * 2, // 탭 개수만큼 넓이 확보
   },
   page: {
     width: SCREEN_WIDTH, // 각 페이지는 화면 한 폭
+    flex: 1,
   },
 }));
