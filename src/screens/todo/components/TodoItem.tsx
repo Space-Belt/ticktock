@@ -3,6 +3,7 @@ import React from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { ITodo } from '@entities/todo';
+import { Font } from '@styles/font';
 
 type Props = {
   todoItem: ITodo;
@@ -16,27 +17,24 @@ const TodoItem = ({ todoItem }: Props) => {
       console.log('onStart', e);
     })
     .onUpdate(e => {
-      // if (onLeft.value) {
-      //   position.value = e.translationX;
-      // } else {
-      //   position.value = END_POSITION + e.translationX;
-      // }
       console.log(e);
     })
-    .onEnd(e => {
-      // if (position.value > END_POSITION / 2) {
-      //   position.value = withTiming(END_POSITION, { duration: 100 });
-      //   onLeft.value = false;
-      // } else {
-      //   position.value = withTiming(0, { duration: 100 });
-      //   onLeft.value = true;
-      // }
-    });
+    .onEnd(e => {});
+
+  const isType =
+    todoItem.goalStartDate && todoItem.goalEndDate ? 'goal' : todoItem.repeat ? 'repeat' : 'todo';
+
+  const isTypeTitle = isType === 'goal' ? '목표' : isType === 'repeat' ? '반복' : '할 일';
 
   return (
     <GestureDetector gesture={panGesture}>
       <View style={styles.container}>
-        <Text>{todoItem?.title ? todoItem.title : ''}</Text>
+        <View style={styles.titleWrapper}>
+          <View style={styles.todoTypeStyle(isType)}>
+            <Text style={styles.todoTypeText}>{isTypeTitle}</Text>
+          </View>
+          <Text style={styles.titleText}>{todoItem?.title ? todoItem.title : ''}</Text>
+        </View>
       </View>
     </GestureDetector>
   );
@@ -50,5 +48,27 @@ const styles = StyleSheet.create(theme => ({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.primary,
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  titleText: {
+    ...Font.bodyMediumBold,
+  },
+  todoTypeStyle: (type: string) => ({
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 8,
+    borderRadius: 20,
+    backgroundColor:
+      type === 'todo'
+        ? theme.colors.background.accent
+        : type === 'repeat'
+        ? theme.colors.background.secondary
+        : theme.colors.background.card,
+  }),
+  todoTypeText: {
+    ...Font.bodySmallExtraBold,
   },
 }));

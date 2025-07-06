@@ -15,30 +15,6 @@ const TodayLists = (props: Props) => {
       {TODAY_TODOS.map((todoEl, todoIndex) => (
         <TodoItem key={todoEl.id} todoItem={todoEl} />
       ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
-      {TODAY_TODOS.map((todoEl, todoIndex) => (
-        <TodoItem key={todoEl.id} todoItem={todoEl} />
-      ))}
     </ScrollView>
   );
 };
