@@ -33,7 +33,7 @@ const WeatherSection = (props: Props) => {
       <View style={styles.weatherWrapper}>
         {renderIcon(data.weather[0].id)}
         <Text>{`${kelvinToCelsius(data.main.temp)} °C`}</Text>
-        <Text>{`${data.main.humidity} %`}</Text>
+        <Text>{`습도: ${data.main.humidity} %`}</Text>
         <Text>{WEATHER_CONDITIONS[data.weather[0].id].name}</Text>
       </View>
     </ItemWrapper>
