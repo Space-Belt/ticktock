@@ -4,22 +4,20 @@ import { StyleSheet } from 'react-native-unistyles';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { ITodo } from '@entities/todo';
 import { Font } from '@styles/font';
+import { useItemSwipeGesture } from '../hook/useTodoItemGuesture';
+import Animated from 'react-native-reanimated';
 
 type Props = {
   todoItem: ITodo;
 };
 
 const TodoItem = ({ todoItem }: Props) => {
-  const panGesture = Gesture.Pan()
-    .activeOffsetX([-10, 10])
-    .failOffsetY([-10, 10])
-    .onStart(e => {
-      console.log('onStart', e);
-    })
-    .onUpdate(e => {
-      console.log(e);
-    })
-    .onEnd(e => {});
+  const panGesture = useItemSwipeGesture(
+    todoItem.id,
+    id => {},
+    (id, dx) => {},
+    id => {},
+  );
 
   const isType =
     todoItem.goalStartDate && todoItem.goalEndDate ? 'goal' : todoItem.repeat ? 'repeat' : 'todo';
@@ -28,14 +26,14 @@ const TodoItem = ({ todoItem }: Props) => {
 
   return (
     <GestureDetector gesture={panGesture}>
-      <View style={styles.container}>
+      <Animated.View style={styles.container}>
         <View style={styles.titleWrapper}>
           <View style={styles.todoTypeStyle(isType)}>
             <Text style={styles.todoTypeText}>{isTypeTitle}</Text>
           </View>
           <Text style={styles.titleText}>{todoItem?.title ? todoItem.title : ''}</Text>
         </View>
-      </View>
+      </Animated.View>
     </GestureDetector>
   );
 };

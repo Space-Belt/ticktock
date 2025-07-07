@@ -43,11 +43,7 @@ const TodoItem = ({ id, title, completed, handleTodoClicked }: Props) => {
   };
 
   React.useEffect(() => {
-    if (completed) {
-      checkWidth.value = withTiming(SCREEN_WIDTH - 54, { duration: 500 });
-    } else {
-      checkWidth.value = withTiming(0, { duration: 500 });
-    }
+    checkWidth.value = withTiming(completed ? SCREEN_WIDTH - 54 : 0, { duration: 500 });
   }, [completed]);
 
   return (
