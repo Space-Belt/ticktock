@@ -1,11 +1,16 @@
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native-unistyles';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { ITodo } from '@entities/todo';
 import { Font } from '@styles/font';
 import { useItemSwipeGesture } from '../hook/useTodoItemGuesture';
-import Animated, { useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  interpolateColor,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
+} from 'react-native-reanimated';
 
 import UnCheckedIcon from '@assets/images/icon_unchecked.svg';
 import CheckedIcon from '@assets/images/icon_checked.svg';
@@ -15,7 +20,7 @@ type Props = {
 };
 
 const TodoItem = ({ todoItem }: Props) => {
-  const translateX = useSharedValue(0);
+  const completedProgress = useSharedValue(isCompleted ? 1 : 0);
 
   const [isCompleted, setIsCompleted] = useState<boolean>(todoItem.completed);
 
@@ -31,9 +36,18 @@ const TodoItem = ({ todoItem }: Props) => {
 
   const isTypeTitle = isType === 'goal' ? '목표' : isType === 'repeat' ? '반복' : '할 일';
 
+  const animatedStyle = useAnimatedStyle(() => {
+    const bg = interpolateColor(completedProgress.value, [0, 1], ['transparent', '#C8E6C9']);
+    return { backgroundColor: bg };
+  });
+
+  useEffect(() => {
+    completedProgress.value = withTiming(isCompleted ? 1 : 0, { duration: 300 });
+  }, [isCompleted]);
+
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View style={styles.container}>
+      <Animated.View style={[styles.container, animatedStyle]}>
         <View style={styles.titleWrapper}>
           <View style={styles.todoTypeStyle(isType)}>
             <Text style={styles.todoTypeText}>{isTypeTitle}</Text>
