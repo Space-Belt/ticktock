@@ -1,17 +1,24 @@
-import { Text, View } from 'react-native';
-import React from 'react';
+import { Pressable, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState } from 'react';
 import { StyleSheet } from 'react-native-unistyles';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector } from 'react-native-gesture-handler';
 import { ITodo } from '@entities/todo';
 import { Font } from '@styles/font';
 import { useItemSwipeGesture } from '../hook/useTodoItemGuesture';
-import Animated from 'react-native-reanimated';
+import Animated, { useSharedValue } from 'react-native-reanimated';
+
+import UnCheckedIcon from '@assets/images/icon_unchecked.svg';
+import CheckedIcon from '@assets/images/icon_checked.svg';
 
 type Props = {
   todoItem: ITodo;
 };
 
 const TodoItem = ({ todoItem }: Props) => {
+  const translateX = useSharedValue(0);
+
+  const [isCompleted, setIsCompleted] = useState<boolean>(todoItem.completed);
+
   const panGesture = useItemSwipeGesture(
     todoItem.id,
     id => {},
@@ -32,6 +39,16 @@ const TodoItem = ({ todoItem }: Props) => {
             <Text style={styles.todoTypeText}>{isTypeTitle}</Text>
           </View>
           <Text style={styles.titleText}>{todoItem?.title ? todoItem.title : ''}</Text>
+        </View>
+        <View style={styles.bottomWrapper}>
+          <View />
+          <TouchableOpacity onPress={() => setIsCompleted(prev => !prev)}>
+            {isCompleted ? (
+              <CheckedIcon width={30} height={30} />
+            ) : (
+              <UnCheckedIcon width={30} height={30} />
+            )}
+          </TouchableOpacity>
         </View>
       </Animated.View>
     </GestureDetector>
@@ -68,5 +85,10 @@ const styles = StyleSheet.create(theme => ({
   }),
   todoTypeText: {
     ...Font.bodySmallExtraBold,
+  },
+  bottomWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
 }));
