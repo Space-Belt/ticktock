@@ -59,11 +59,7 @@ const TodoListScreen = (props: Props) => {
   }));
 
   React.useEffect(() => {
-    if (selectedPanel === 0) {
-      translateX.value = withSpring(0);
-    } else {
-      translateX.value = withSpring(-SCREEN_WIDTH);
-    }
+    translateX.value = withSpring(selectedPanel === 0 ? 0 : -SCREEN_WIDTH);
   }, [selectedPanel]);
 
   return (
@@ -82,7 +78,7 @@ const TodoListScreen = (props: Props) => {
         }
       />
       <TickTockPanel
-        panelList={[{ title: '오늘' }, { title: '반복' }]}
+        panelList={[{ title: '할일' }, { title: '반복' }]}
         selectedPanel={selectedPanel}
         handleChangePanel={handleChangePanel}
       />
