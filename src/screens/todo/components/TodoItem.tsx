@@ -83,9 +83,6 @@ const TodoItem = ({ todoItem, onDelete }: Props) => {
   }));
 
   const handleDelete = () => {
-    // translateX.value = withTiming(-SCREEN_WIDTH, { duration: 200 }, () =>
-    //   runOnJS(onDelete)(todoItem.id),
-    // );
     deleteAnim.value = withTiming(SCREEN_WIDTH, { duration: 200 }, () => {
       runOnJS(onDelete)(todoItem.id);
     });
@@ -124,22 +121,14 @@ const TodoItem = ({ todoItem, onDelete }: Props) => {
           <Pressable style={[styles.actionButton, styles.editWrapper]}>
             <EditIcon width={24} height={24} />
           </Pressable>
-          {/* <Pressable style={[styles.actionButton, styles.deleteWrapper]} onPress={handleDelete}>
-            <DeleteIcon width={24} height={24} />
-          </Pressable> */}
           <Animated.View style={[styles.actionButton, deleteAnimStyle, styles.deleteWrapper]}>
-            <Pressable onPress={handleDelete} style={StyleSheet.absoluteFill} />
-            <DeleteIcon width={24} height={24} />
+            <Pressable
+              onPress={handleDelete}
+              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
+              <DeleteIcon width={24} height={24} />
+            </Pressable>
           </Animated.View>
         </Animated.View>
-        {/* <Animated.View style={[styles.deleteWrapper, deleteStyle]}>
-          <Pressable style={[styles.actionButton]}>
-            <EditIcon width={24} height={24} />
-          </Pressable>
-          <Pressable style={styles.actionButton}>
-            <DeleteIcon width={30} height={30} />
-          </Pressable>
-        </Animated.View> */}
       </View>
     </GestureDetector>
   );
