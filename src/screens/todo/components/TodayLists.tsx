@@ -5,11 +5,19 @@ import { TODAY_TODOS } from '@utils/mock';
 import TodoItem from './TodoItem';
 import useDate from '@hooks/useDate';
 import PrevNextController from '@screens/home/components/PrevNextController';
+import { ITodo } from '@entities/todo';
 
 type Props = {};
 
 const TodayLists = (props: Props) => {
   const { currentDate, goToPreviousDay, goToNextDay } = useDate();
+
+  const [todoData, setTodoData] = React.useState<ITodo[]>([...TODAY_TODOS]);
+
+  const handleDelete = (id: string) => {
+    const updatedTodos = todoData.filter(todo => todo.id !== id);
+    setTodoData(updatedTodos);
+  };
   return (
     <View>
       <View style={styles.dateStyle}>
@@ -22,8 +30,8 @@ const TodayLists = (props: Props) => {
         />
       </View>
       <ScrollView>
-        {TODAY_TODOS.map((todoEl, todoIndex) => (
-          <TodoItem key={todoEl.id} todoItem={todoEl} />
+        {todoData.map((todoEl, todoIndex) => (
+          <TodoItem onDelete={handleDelete} key={todoEl.id} todoItem={todoEl} />
         ))}
       </ScrollView>
     </View>
