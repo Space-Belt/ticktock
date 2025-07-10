@@ -14,18 +14,22 @@ import Animated, {
   interpolateColor,
   useAnimatedStyle,
   useSharedValue,
+  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 
 import UnCheckedIcon from '@assets/images/icon_unchecked.svg';
 import CheckedIcon from '@assets/images/icon_checked.svg';
 import DeleteIcon from '@assets/images/icon_delete.svg';
+import EditIcon from '@assets/images/icon_edit.svg';
+
+import { SCREEN_WIDTH } from '@utils/public';
 
 type Props = {
   todoItem: ITodo;
 };
 
-const ACTION_WIDTH = 80;
+const ACTION_WIDTH = 160;
 
 const TodoItem = ({ todoItem }: Props) => {
   const [isCompleted, setIsCompleted] = useState<boolean>(todoItem.completed);
@@ -44,9 +48,11 @@ const TodoItem = ({ todoItem }: Props) => {
   };
   const onSwipeEnd = (_: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
     if (translateX.value < -ACTION_WIDTH / 2) {
-      translateX.value = withTiming(-ACTION_WIDTH);
+      translateX.value = withTiming(-ACTION_WIDTH - 20, { duration: 100 }, () => {
+        translateX.value = withSpring(-ACTION_WIDTH, { damping: 12 });
+      });
     } else {
-      translateX.value = withTiming(0);
+      translateX.value = withSpring(0);
     }
   };
 
@@ -70,6 +76,10 @@ const TodoItem = ({ todoItem }: Props) => {
 
   const deleteStyle = useAnimatedStyle(() => ({
     width: translateX.value < 0 ? -translateX.value + 15 : 0,
+  }));
+
+  const actionStyle = useAnimatedStyle(() => ({
+    width: translateX.value < 0 ? -translateX.value : 0,
   }));
 
   useEffect(() => {
@@ -97,9 +107,22 @@ const TodoItem = ({ todoItem }: Props) => {
             </TouchableOpacity>
           </View>
         </Animated.View>
-        <Animated.View style={[styles.deleteWrapper, deleteStyle]}>
-          <DeleteIcon width={30} height={30} />
+        <Animated.View style={[styles.actions, actionStyle]}>
+          <Pressable style={styles.actionButton}>
+            <EditIcon width={24} height={24} />
+          </Pressable>
+          <Pressable style={styles.actionButton}>
+            <DeleteIcon width={24} height={24} />
+          </Pressable>
         </Animated.View>
+        {/* <Animated.View style={[styles.deleteWrapper, deleteStyle]}>
+          <Pressable style={[styles.actionButton]}>
+            <EditIcon width={24} height={24} />
+          </Pressable>
+          <Pressable style={styles.actionButton}>
+            <DeleteIcon width={30} height={30} />
+          </Pressable>
+        </Animated.View> */}
       </View>
     </GestureDetector>
   );
@@ -151,8 +174,23 @@ const styles = StyleSheet.create(theme => ({
     top: 0,
     bottom: 0,
     right: 0,
-    // right: -15,
+    flexDirection: 'row',
     backgroundColor: 'red',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actions: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    overflow: 'hidden', // 너비 외부 잘라내기
+  },
+  actionButton: {
+    width: ACTION_WIDTH / 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
