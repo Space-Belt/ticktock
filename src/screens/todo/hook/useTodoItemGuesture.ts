@@ -1,23 +1,28 @@
-import { Gesture } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureStateChangeEvent,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
 import type { ITodo } from '@entities/todo';
 
 export const useItemSwipeGesture = (
   todoId: string,
-  onSwipeStart: (id: string) => void,
-  onSwipeUpdate: (id: string, dx: number) => void,
-  onSwipeEnd: (id: string) => void,
+  onSwipeStart: (e: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => void,
+  onSwipeUpdate: (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => void,
+  onSwipeEnd: (e: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => void,
 ) => {
   return Gesture.Pan()
     .activeOffsetX([-10, 10])
     .failOffsetY([-10, 10])
-    .onStart(() => {
-      runOnJS(onSwipeStart)(todoId);
+    .onStart(e => {
+      runOnJS(onSwipeStart)(e);
     })
     .onUpdate(e => {
-      runOnJS(onSwipeUpdate)(todoId, e.translationX);
+      runOnJS(onSwipeUpdate)(e);
     })
-    .onEnd(() => {
-      runOnJS(onSwipeEnd)(todoId);
+    .onEnd(e => {
+      runOnJS(onSwipeEnd)(e);
     });
 };
