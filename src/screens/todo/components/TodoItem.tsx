@@ -1,7 +1,12 @@
 import { Pressable, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet } from 'react-native-unistyles';
-import { GestureDetector } from 'react-native-gesture-handler';
+import {
+  GestureDetector,
+  GestureStateChangeEvent,
+  GestureUpdateEvent,
+  PanGestureHandlerEventPayload,
+} from 'react-native-gesture-handler';
 import { ITodo } from '@entities/todo';
 import { Font } from '@styles/font';
 import { useItemSwipeGesture } from '../hook/useTodoItemGuesture';
@@ -14,22 +19,38 @@ import Animated, {
 
 import UnCheckedIcon from '@assets/images/icon_unchecked.svg';
 import CheckedIcon from '@assets/images/icon_checked.svg';
+import DeleteIcon from '@assets/images/icon_delete.svg';
 
 type Props = {
   todoItem: ITodo;
 };
 
-const TodoItem = ({ todoItem }: Props) => {
-  const completedProgress = useSharedValue(isCompleted ? 1 : 0);
+const ACTION_WIDTH = 80;
 
+const TodoItem = ({ todoItem }: Props) => {
   const [isCompleted, setIsCompleted] = useState<boolean>(todoItem.completed);
 
-  const panGesture = useItemSwipeGesture(
-    todoItem.id,
-    id => {},
-    (id, dx) => {},
-    id => {},
-  );
+  const completedProgress = useSharedValue(isCompleted ? 1 : 0);
+  const translateX = useSharedValue(0);
+  const tempTranslateX = useSharedValue(0);
+
+  const onSwipeStart = (e: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
+    tempTranslateX.value = translateX.value;
+  };
+
+  const onSwipeUpdate = (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
+    const next = tempTranslateX.value + e.translationX;
+    translateX.value = Math.min(Math.max(next, -ACTION_WIDTH), 0);
+  };
+  const onSwipeEnd = (_: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
+    if (translateX.value < -ACTION_WIDTH / 2) {
+      translateX.value = withTiming(-ACTION_WIDTH);
+    } else {
+      translateX.value = withTiming(0);
+    }
+  };
+
+  const panGesture = useItemSwipeGesture(todoItem.id, onSwipeStart, onSwipeUpdate, onSwipeEnd);
 
   const isType =
     todoItem.goalStartDate && todoItem.goalEndDate ? 'goal' : todoItem.repeat ? 'repeat' : 'todo';
@@ -41,30 +62,45 @@ const TodoItem = ({ todoItem }: Props) => {
     return { backgroundColor: bg };
   });
 
+  const moveAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ translateX: translateX.value }],
+    };
+  });
+
+  const deleteStyle = useAnimatedStyle(() => ({
+    width: translateX.value < 0 ? -translateX.value + 15 : 0,
+  }));
+
   useEffect(() => {
     completedProgress.value = withTiming(isCompleted ? 1 : 0, { duration: 300 });
   }, [isCompleted]);
 
   return (
     <GestureDetector gesture={panGesture}>
-      <Animated.View style={[styles.container, animatedStyle]}>
-        <View style={styles.titleWrapper}>
-          <View style={styles.todoTypeStyle(isType)}>
-            <Text style={styles.todoTypeText}>{isTypeTitle}</Text>
+      <View style={styles.wrapper}>
+        <Animated.View style={[styles.container, animatedStyle, moveAnimatedStyle]}>
+          <View style={styles.titleWrapper}>
+            <View style={styles.todoTypeStyle(isType)}>
+              <Text style={styles.todoTypeText}>{isTypeTitle}</Text>
+            </View>
+            <Text style={styles.titleText}>{todoItem?.title ? todoItem.title : ''}</Text>
           </View>
-          <Text style={styles.titleText}>{todoItem?.title ? todoItem.title : ''}</Text>
-        </View>
-        <View style={styles.bottomWrapper}>
-          <View />
-          <TouchableOpacity onPress={() => setIsCompleted(prev => !prev)}>
-            {isCompleted ? (
-              <CheckedIcon width={30} height={30} />
-            ) : (
-              <UnCheckedIcon width={30} height={30} />
-            )}
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+          <View style={styles.bottomWrapper}>
+            <View />
+            <TouchableOpacity onPress={() => setIsCompleted(prev => !prev)}>
+              {isCompleted ? (
+                <CheckedIcon width={30} height={30} />
+              ) : (
+                <UnCheckedIcon width={30} height={30} />
+              )}
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+        <Animated.View style={[styles.deleteWrapper, deleteStyle]}>
+          <DeleteIcon width={30} height={30} />
+        </Animated.View>
+      </View>
     </GestureDetector>
   );
 };
@@ -72,7 +108,12 @@ const TodoItem = ({ todoItem }: Props) => {
 export default TodoItem;
 
 const styles = StyleSheet.create(theme => ({
+  wrapper: {
+    position: 'relative',
+    marginBottom: 2,
+  },
   container: {
+    marginBottom: 2,
     paddingHorizontal: 16,
     paddingVertical: 10,
     borderBottomWidth: 1,
@@ -104,5 +145,15 @@ const styles = StyleSheet.create(theme => ({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+  },
+  deleteWrapper: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    right: 0,
+    // right: -15,
+    backgroundColor: 'red',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 }));
