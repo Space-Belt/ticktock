@@ -70,7 +70,7 @@ const TodoListScreen = (props: Props) => {
           <Pressable
             style={styles.calendarWrapper}
             onPress={() => {
-              navigation.goBack();
+              navigation.navigate('MainStack', { screen: 'Calendar' });
             }}>
             <Text style={styles.calendarText}>달력</Text>
             <CalendarIcon />
