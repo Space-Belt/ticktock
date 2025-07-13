@@ -1,14 +1,16 @@
-import { Animated, Pressable, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
-import { StyleSheet } from 'react-native-unistyles';
 import { ITodo } from '@entities/todo';
+import React from 'react';
+import { Animated, Pressable, Text, View } from 'react-native';
 import {
   GestureDetector,
   GestureStateChangeEvent,
   GestureUpdateEvent,
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
+import { StyleSheet } from 'react-native-unistyles';
 
+import { Font } from '@styles/font';
+import { SCREEN_WIDTH } from '@utils/public';
 import {
   interpolateColor,
   runOnJS,
@@ -17,11 +19,10 @@ import {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
-import { Font } from '@styles/font';
-import { SCREEN_WIDTH } from '@utils/public';
 
 import DeleteIcon from '@assets/images/icon_delete.svg';
 import EditIcon from '@assets/images/icon_edit.svg';
+import { getWeekdayInfo } from '@utils/dateUtil';
 import { useItemSwipeGesture } from '../hook/useTodoItemGuesture';
 
 type Props = {
@@ -85,8 +86,17 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
     <GestureDetector gesture={panGesture}>
       <View style={styles.wrapper}>
         <Animated.View style={[styles.container, animatedStyle, moveAnimatedStyle]}>
-          <View style={styles.titleWrapper}>
-            <Text style={styles.titleText}>{repeatItem?.title ? repeatItem.title : ''}</Text>
+          <View>
+            <View style={styles.dateWrapper}>
+              {repeatItem?.repeatDays?.map((day, index) => (
+                <Text style={styles.dateTextStyle(getWeekdayInfo(day).color)}>
+                  {getWeekdayInfo(day).label}
+                </Text>
+              ))}
+            </View>
+            <View style={styles.titleWrapper}>
+              <Text style={styles.titleText}>{repeatItem?.title ? repeatItem.title : ''}</Text>
+            </View>
           </View>
         </Animated.View>
         <Animated.View style={[styles.actions, actionStyle]}>
@@ -120,6 +130,22 @@ const styles = StyleSheet.create(theme => ({
     borderBottomWidth: 1,
     borderBottomColor: theme.colors.border.primary,
   },
+  dateWrapper: {
+    flexDirection: 'row',
+    gap: 6,
+    marginBottom: 10,
+  },
+  dateTextStyle: (color: string) => ({
+    width: 25,
+    height: 25,
+    textAlign: 'center',
+    borderRadius: 15,
+    backgroundColor: color,
+    alignItems: 'center',
+    justifyContent: 'center',
+    verticalAlign: 'middle',
+    lineHeight: 23,
+  }),
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -127,21 +153,7 @@ const styles = StyleSheet.create(theme => ({
   titleText: {
     ...Font.bodyMediumBold,
   },
-  todoTypeStyle: (type: string) => ({
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    marginRight: 8,
-    borderRadius: 20,
-    backgroundColor:
-      type === 'todo'
-        ? theme.colors.background.accent
-        : type === 'repeat'
-        ? theme.colors.background.secondary
-        : theme.colors.background.card,
-  }),
-  todoTypeText: {
-    ...Font.bodySmallExtraBold,
-  },
+
   bottomWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -157,7 +169,7 @@ const styles = StyleSheet.create(theme => ({
     position: 'absolute',
     top: 0,
     bottom: 0,
-    right: 0,
+    right: -ACTION_WIDTH,
     flexDirection: 'row',
     // alignItems: 'center',
     justifyContent: 'flex-end',
