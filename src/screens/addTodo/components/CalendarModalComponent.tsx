@@ -13,6 +13,8 @@ type Props = {
   setGoalEndDate: Dispatch<SetStateAction<string | null | undefined>>;
   setSelectedDates: Dispatch<SetStateAction<string[]>>;
   setIsStartToEnd: Dispatch<SetStateAction<boolean>>;
+  repeatYear: boolean;
+  setRepeatYear: Dispatch<SetStateAction<boolean>>;
   displayedMarkedDates: any;
 };
 
@@ -24,6 +26,8 @@ const CalendarModalComponent = ({
   setGoalEndDate,
   setSelectedDates,
   setIsStartToEnd,
+  repeatYear,
+  setRepeatYear,
   displayedMarkedDates,
 }: Props) => {
   const today = moment().format('YYYY-MM-DD');
@@ -81,6 +85,7 @@ const CalendarModalComponent = ({
         setToggleStatus={setIsStartToEnd}
         toggleStatus={isStartToEnd}
       />
+      <ToggleButton title="매년 반복" toggleStatus={repeatYear} setToggleStatus={setRepeatYear} />
     </>
   );
 };
