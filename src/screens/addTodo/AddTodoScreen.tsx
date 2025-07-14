@@ -29,6 +29,7 @@ import DayAndRepeatPicker from './components/DayAndRepeatPicker';
 import SelectColor from './components/SelectColor';
 import StartEndTimePicker from './components/StartEndTimePicker';
 import ToggleButton from './components/ToggleButton';
+import DatePicker from 'react-native-date-picker';
 
 const BOTTOM_BUTTON_HEIGHT = 45;
 
@@ -86,6 +87,9 @@ const AddTodoScreen = () => {
 
   const [isStartToEnd, setIsStartToEnd] = React.useState<boolean>(false);
 
+  const [showEndDate, setShowEndDate] = React.useState<boolean>(false);
+  const [endDate, setEndDate] = React.useState<Date>(new Date());
+
   const displayedMarkedDates = React.useMemo(() => {
     return isStartToEnd ? generateMarkedDates() : markedDates;
   }, [isStartToEnd, goalStartDate, goalEndDate, markedDates]);
@@ -99,6 +103,8 @@ const AddTodoScreen = () => {
   const [selectedEndTime, setSelectedEndTime] = React.useState<Date>(new Date());
 
   const [isRepeat, setIsRepeat] = React.useState<boolean>(false);
+
+  const [repeatYear, setRepeatYear] = React.useState<boolean>(false);
   const [isEveryDay, setIsEveryDay] = React.useState<boolean>(false);
 
   const [repeat, setRepeat] = React.useState<string>('daily');
@@ -137,6 +143,8 @@ const AddTodoScreen = () => {
         setSelectedDates={setSelectedDates}
         setIsStartToEnd={setIsStartToEnd}
         displayedMarkedDates={displayedMarkedDates}
+        repeatYear={repeatYear}
+        setRepeatYear={setRepeatYear}
       />,
       '선택',
       '',
@@ -270,6 +278,16 @@ const AddTodoScreen = () => {
                 </Pressable>
               ))}
             </View>
+
+            <TouchableOpacity
+              style={styles.endButtonStyle}
+              onPress={() => {
+                setShowEndDate(prev => !prev);
+              }}>
+              <Text style={styles.endDateTextStyle}>
+                종료일: {moment(endDate).format('YYYY-MM-DD')}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
         <SelectColor
@@ -323,6 +341,21 @@ const AddTodoScreen = () => {
         setSelectedStartTime={setSelectedStartTime}
         setIsEndTimeModal={setIsEndTimeModal}
         setSelectedEndTime={setSelectedEndTime}
+      />
+      <DatePicker
+        modal
+        title={'종료일을 선택하세요'}
+        date={endDate}
+        onConfirm={(select: Date) => {
+          setEndDate(select);
+        }}
+        onCancel={() => {
+          setShowEndDate(false);
+        }}
+        mode={'date'}
+        confirmText="설정"
+        cancelText="취소"
+        open={showEndDate}
       />
     </View>
   );
@@ -469,5 +502,18 @@ const styles = StyleSheet.create(theme => ({
     fontSize: 14,
     textAlign: 'center',
     fontWeight: '700',
+  },
+  endButtonStyle: {
+    backgroundColor: theme.colors.button.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderRadius: 8,
+    marginBototm: 10,
+  },
+  endDateTextStyle: {
+    ...Font.bodyMediumBold,
+    color: theme.colors.text.secondary,
+    flex: 1,
   },
 }));
