@@ -47,15 +47,16 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
     const next = tempTranslateX.value + e.translationX;
     translateX.value = Math.min(Math.max(next, -ACTION_WIDTH), 0);
   };
+
   const onSwipeEnd = (_: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
+    // 스와이프 후, 삭제 액션이 보여지도록 함
     if (translateX.value < -ACTION_WIDTH / 2) {
-      translateX.value = withTiming(-ACTION_WIDTH - 20, { duration: 100 }, () => {
-        translateX.value = withSpring(-ACTION_WIDTH, { damping: 12 });
-      });
+      translateX.value = withTiming(-ACTION_WIDTH, { duration: 100 });
     } else {
       translateX.value = withSpring(0);
     }
   };
+
   const panGesture = useItemSwipeGesture(repeatItem.id, onSwipeStart, onSwipeUpdate, onSwipeEnd);
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -79,9 +80,11 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
     width: deleteAnim.value,
   }));
 
+  // translateX에 따라서 액션 버튼이 보이도록 설정
   const actionStyle = useAnimatedStyle(() => ({
     width: translateX.value < 0 ? -translateX.value : 0,
   }));
+
   return (
     <GestureDetector gesture={panGesture}>
       <View style={styles.wrapper}>
@@ -89,7 +92,7 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
           <View>
             <View style={styles.dateWrapper}>
               {repeatItem?.repeatDays?.map((day, index) => (
-                <Text style={styles.dateTextStyle(getWeekdayInfo(day).color)}>
+                <Text key={day} style={styles.dateTextStyle(getWeekdayInfo(day).color)}>
                   {getWeekdayInfo(day).label}
                 </Text>
               ))}
@@ -99,6 +102,7 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
             </View>
           </View>
         </Animated.View>
+        {/* 액션 버튼은 translateX에 따라 보이도록 */}
         <Animated.View style={[styles.actions, actionStyle]}>
           <Pressable style={[styles.actionButton, styles.editWrapper]}>
             <EditIcon width={24} height={24} />
