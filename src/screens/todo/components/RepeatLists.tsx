@@ -26,7 +26,5 @@ const RepeatLists = (props: Props) => {
 export default RepeatLists;
 
 const styles = StyleSheet.create(theme => ({
-  container: {
-    // flex: 1,
-  },
+  container: {},
 }));

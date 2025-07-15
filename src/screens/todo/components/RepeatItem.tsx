@@ -1,7 +1,8 @@
 import { ITodo } from '@entities/todo';
 import React from 'react';
-import { Animated, Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import {
+  Gesture,
   GestureDetector,
   GestureStateChangeEvent,
   GestureUpdateEvent,
@@ -11,9 +12,10 @@ import { StyleSheet } from 'react-native-unistyles';
 
 import { Font } from '@styles/font';
 import { SCREEN_WIDTH } from '@utils/public';
-import {
+import Animated, {
   interpolateColor,
   runOnJS,
+  useAnimatedReaction,
   useAnimatedStyle,
   useSharedValue,
   withSpring,
@@ -33,7 +35,6 @@ type Props = {
 const ACTION_WIDTH = 160;
 
 const RepeatItem = ({ repeatItem, onDelete }: Props) => {
-  const completedProgress = useSharedValue(0);
   const translateX = useSharedValue(0);
   const tempTranslateX = useSharedValue(0);
 
@@ -45,13 +46,15 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
 
   const onSwipeUpdate = (e: GestureUpdateEvent<PanGestureHandlerEventPayload>) => {
     const next = tempTranslateX.value + e.translationX;
+    console.log(next);
     translateX.value = Math.min(Math.max(next, -ACTION_WIDTH), 0);
   };
 
   const onSwipeEnd = (_: GestureStateChangeEvent<PanGestureHandlerEventPayload>) => {
-    // 스와이프 후, 삭제 액션이 보여지도록 함
     if (translateX.value < -ACTION_WIDTH / 2) {
-      translateX.value = withTiming(-ACTION_WIDTH, { duration: 100 });
+      translateX.value = withTiming(-ACTION_WIDTH - 20, { duration: 100 }, () => {
+        translateX.value = withSpring(-ACTION_WIDTH, { damping: 12 });
+      });
     } else {
       translateX.value = withSpring(0);
     }
@@ -59,16 +62,9 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
 
   const panGesture = useItemSwipeGesture(repeatItem.id, onSwipeStart, onSwipeUpdate, onSwipeEnd);
 
-  const animatedStyle = useAnimatedStyle(() => {
-    const bg = interpolateColor(completedProgress.value, [0, 1], ['transparent', '#C8E6C9']);
-    return { backgroundColor: bg };
-  });
-
-  const moveAnimatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateX: translateX.value }],
-    };
-  });
+  const moveAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }],
+  }));
 
   const handleDelete = () => {
     deleteAnim.value = withTiming(SCREEN_WIDTH, { duration: 200 }, () => {
@@ -80,39 +76,51 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
     width: deleteAnim.value,
   }));
 
-  // translateX에 따라서 액션 버튼이 보이도록 설정
-  const actionStyle = useAnimatedStyle(() => ({
-    width: translateX.value < 0 ? -translateX.value : 0,
-  }));
+  // const actionStyle = useAnimatedStyle(() => ({
+  //   transform: [
+  //     {
+  //       translateX: translateX.value,
+  //     },
+  //   ],
+  // }));
+
+  useAnimatedReaction(
+    () => translateX.value,
+    value => {
+      console.log('translateX value changed: ', value);
+    },
+    [translateX],
+  );
 
   return (
     <GestureDetector gesture={panGesture}>
       <View style={styles.wrapper}>
-        <Animated.View style={[styles.container, animatedStyle, moveAnimatedStyle]}>
-          <View>
-            <View style={styles.dateWrapper}>
-              {repeatItem?.repeatDays?.map((day, index) => (
-                <Text key={day} style={styles.dateTextStyle(getWeekdayInfo(day).color)}>
-                  {getWeekdayInfo(day).label}
-                </Text>
-              ))}
-            </View>
-            <View style={styles.titleWrapper}>
-              <Text style={styles.titleText}>{repeatItem?.title ? repeatItem.title : ''}</Text>
-            </View>
+        <Animated.View style={[styles.container, moveAnimatedStyle]}>
+          <View style={styles.dateWrapper}>
+            {repeatItem?.repeatDays?.map((day, index) => (
+              <Text key={day} style={styles.dateTextStyle(getWeekdayInfo(day).color)}>
+                {getWeekdayInfo(day).label}
+              </Text>
+            ))}
           </View>
-        </Animated.View>
-        {/* 액션 버튼은 translateX에 따라 보이도록 */}
-        <Animated.View style={[styles.actions, actionStyle]}>
-          <Pressable style={[styles.actionButton, styles.editWrapper]}>
-            <EditIcon width={24} height={24} />
-          </Pressable>
-          <Animated.View style={[styles.actionButton, deleteAnimStyle, styles.deleteWrapper]}>
-            <Pressable
-              onPress={handleDelete}
-              hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
-              <DeleteIcon width={24} height={24} />
+          <View style={styles.titleWrapper}>
+            <Text style={styles.titleText}>{repeatItem?.title ? repeatItem.title : ''}</Text>
+          </View>
+          <Text style={styles.startToEndTextStyle}>
+            {repeatItem?.repeatStartDate} ~ {repeatItem?.repeatEndDate}
+          </Text>
+
+          <Animated.View style={[styles.actions]}>
+            <Pressable style={[styles.actionButton, styles.editWrapper]}>
+              <EditIcon width={24} height={24} />
             </Pressable>
+            <Animated.View style={[styles.actionButton, deleteAnimStyle, styles.deleteWrapper]}>
+              <Pressable
+                onPress={handleDelete}
+                hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}>
+                <DeleteIcon width={24} height={24} />
+              </Pressable>
+            </Animated.View>
           </Animated.View>
         </Animated.View>
       </View>
@@ -184,5 +192,9 @@ const styles = StyleSheet.create(theme => ({
 
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  startToEndTextStyle: {
+    ...Font.bodySmall,
+    marginTop: 8,
   },
 }));

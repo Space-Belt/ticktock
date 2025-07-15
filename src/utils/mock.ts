@@ -221,6 +221,7 @@ export const REPEAT_TODOS: ITodo[] = [
     repeat: 'daily',
     repeatStartDate: '2025-06-01',
     repeatEndDate: '2025-12-31',
+    repeatDays: ['mon', 'wed', 'fri'],
     completedDates: ['2025-07-10', '2025-07-11'],
   },
   {
@@ -240,6 +241,7 @@ export const REPEAT_TODOS: ITodo[] = [
     completed: false,
     created_at: '2025-01-01',
     repeat: 'monthly',
+    repeatDays: ['sat', 'sun'],
     repeatStartDate: '2025-01-01',
     repeatEndDate: '2025-12-01',
     completedDates: ['2025-07-01'],
@@ -251,7 +253,8 @@ export const REPEAT_TODOS: ITodo[] = [
     created_at: '2020-03-14',
     repeat: 'yearly',
     repeatStartDate: '2020-03-14',
-    // yearly는 보통 종료일 없이 설정
+    repeatEndDate: '2030-03-14',
+    repeatDays: ['sat', 'sun'],
     completedDates: ['2025-03-14'],
   },
   {

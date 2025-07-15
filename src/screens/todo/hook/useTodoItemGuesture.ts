@@ -5,7 +5,6 @@ import {
   PanGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 import { runOnJS } from 'react-native-reanimated';
-import type { ITodo } from '@entities/todo';
 
 export const useItemSwipeGesture = (
   todoId: string,
