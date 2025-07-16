@@ -2,7 +2,6 @@ import { ITodo } from '@entities/todo';
 import React from 'react';
 import { Pressable, Text, View } from 'react-native';
 import {
-  Gesture,
   GestureDetector,
   GestureStateChangeEvent,
   GestureUpdateEvent,
@@ -13,7 +12,6 @@ import { StyleSheet } from 'react-native-unistyles';
 import { Font } from '@styles/font';
 import { SCREEN_WIDTH } from '@utils/public';
 import Animated, {
-  interpolateColor,
   runOnJS,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -75,14 +73,6 @@ const RepeatItem = ({ repeatItem, onDelete }: Props) => {
   const deleteAnimStyle = useAnimatedStyle(() => ({
     width: deleteAnim.value,
   }));
-
-  // const actionStyle = useAnimatedStyle(() => ({
-  //   transform: [
-  //     {
-  //       translateX: translateX.value,
-  //     },
-  //   ],
-  // }));
 
   useAnimatedReaction(
     () => translateX.value,
