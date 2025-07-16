@@ -5,14 +5,16 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StackNavigationProp } from '@react-navigation/stack';
 import AddTodoScreen from '@screens/addTodo/AddTodoScreen';
 import CalendarScreen from '@screens/calendar/CalendarScreen';
+import EditTodoScreen from '@screens/editTodo/EditTodoScreen';
 import RepeatTodoScreen from '@screens/repeatTodo/RepeatTodoScreen';
 import SettingScreen from '@screens/setting/SettingScreen';
 
 export type MainStackParamList = {
   SettingScreen: undefined;
-  AddTodo: undefined;
+  AddTodo: undefined | ITodo;
   Calendar: undefined;
   RepeatTodo: ITodo;
+  EditTodo: ITodo;
 };
 
 export type MainStackNavigatorProp = StackNavigationProp<MainStackParamList>;
@@ -29,6 +31,7 @@ const MainStackNavigator = () => {
         <MainStack.Screen name="AddTodo" component={AddTodoScreen} />
         <MainStack.Screen name="Calendar" component={CalendarScreen} />
         <MainStack.Screen name="RepeatTodo" component={RepeatTodoScreen} />
+        <MainStack.Screen name="EditTodo" component={EditTodoScreen} />
       </MainStack.Navigator>
     </TickTockSafeAreaView>
   );
